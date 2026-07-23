@@ -16,6 +16,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --paper:#FBF7FE;
@@ -269,6 +272,7 @@
   <header class="top">
     <div class="brand-row">
       <div class="brand">Inventory<small>Your gear, all in one place</small></div>
+      <span id="syncBadge" style="display:none;background:rgba(255,255,255,0.22);color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:10.5px;padding:4px 10px;border-radius:999px;white-space:nowrap;">&#9679; Synced</span>
     </div>
     <div class="stat-strip">
       <div class="s">Items <b id="statTotal">-</b></div>
@@ -321,6 +325,37 @@ function defaultRuntime(item){
   }
 }
 
+/* ============================================================
+   MULTI-DEVICE SYNC SETUP (optional)
+   To sync your inventory live across every device, create a free
+   Firebase project and paste your config below. See the setup
+   guide for step-by-step instructions. Leave as-is to keep using
+   local-only storage (each device keeps its own separate copy).
+   ============================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDjbafFWy2g-OHfZ-y2v_OeCi8gnP0gth",
+  authDomain: "it-inventory-436d6.firebaseapp.com",
+  projectId: "it-inventory-436d6",
+  storageBucket: "it-inventory-436d6.firebasestorage.app",
+  messagingSenderId: "432718689377",
+  appId: "1:432718689377:web:65b5ac148bb9d5a0d92620"
+};
+const hasFirebaseConfig = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY';
+let firestoreDocRef = null;
+
+async function initFirebase(){
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    await firebase.auth().signInAnonymously();
+    const db = firebase.firestore();
+    firestoreDocRef = db.collection('inventory').doc('state');
+    return true;
+  }catch(e){
+    console.error('Firebase init failed, falling back to local storage', e);
+    return false;
+  }
+}
+
 /* ============ STORAGE ADAPTER (works inside Claude, and standalone) ============ */
 const hasClaudeStorage = typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function';
 
@@ -346,7 +381,7 @@ async function storageSet(key, value){
   }catch(e){ return null; }
 }
 
-async function loadState(){
+async function loadLocalState(){
   const res = await storageGet('inventory-state');
   if(res && res.value){
     try{ STATE = JSON.parse(res.value); return; }catch(e){ /* fall through to reseed */ }
@@ -356,7 +391,45 @@ async function loadState(){
   await persist();
 }
 
+async function loadState(){
+  if(hasFirebaseConfig && !hasClaudeStorage){
+    const ok = await initFirebase();
+    if(ok){
+      const badge = document.getElementById('syncBadge');
+      if(badge) badge.style.display = 'inline-block';
+      await new Promise((resolve)=>{
+        let firstLoad = true;
+        firestoreDocRef.onSnapshot((doc)=>{
+          if(doc.exists){
+            STATE = doc.data();
+          } else if(firstLoad){
+            const items = SEED_ITEMS.map(it => Object.assign({}, it, defaultRuntime(it)));
+            STATE = {items, log:[]};
+            firestoreDocRef.set(STATE);
+          }
+          if(firstLoad){
+            firstLoad = false;
+            resolve();
+          } else if(currentTab !== 'scan'){
+            // Live update pushed from another device
+            render();
+          }
+        }, (err)=>{
+          console.error('Firestore listen error, falling back to local storage', err);
+          if(firstLoad){ firstLoad = false; loadLocalState().then(resolve); }
+        });
+      });
+      return;
+    }
+  }
+  await loadLocalState();
+}
+
 async function persist(){
+  if(hasFirebaseConfig && firestoreDocRef){
+    try{ await firestoreDocRef.set(STATE); return; }
+    catch(e){ console.error('Firestore write failed, saving locally instead', e); }
+  }
   await storageSet('inventory-state', JSON.stringify(STATE));
 }
 
