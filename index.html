@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#EEEBE0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Inventory">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<title>Inventory Manifest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --paper:#EEEBE0;
+    --paper-alt:#E6E2D3;
+    --card:#FBFAF5;
+    --ink:#23262B;
+    --ink-soft:#5B5F5A;
+    --line:#C9C4B2;
+    --green:#2F6B4F;
+    --green-bg:#E1EBE3;
+    --rust:#A8452A;
+    --rust-bg:#F2E1DA;
+    --blue:#2E5C8A;
+    --blue-bg:#DEE6EE;
+    --amber:#93641A;
+    --amber-bg:#F1E5CC;
+    --radius:10px;
+    --shadow: 0 1px 0 rgba(35,38,43,0.06), 0 2px 6px rgba(35,38,43,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--paper-alt) 1px, transparent 1px);
+    background-size: 100% 32px;
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  #app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;position:relative;padding-bottom:78px;}
+
+  /* HEADER */
+  header.top{
+    padding:22px 18px 14px;
+    border-bottom:2px solid var(--ink);
+    background:var(--paper);
+    position:sticky;top:0;z-index:20;
+  }
+  .brand-row{display:flex;align-items:baseline;justify-content:space-between;}
+  .brand{
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    font-size:24px;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+  }
+  .brand small{
+    display:block;font-family:'IBM Plex Mono',monospace;font-weight:400;
+    font-size:10.5px;letter-spacing:1.5px;color:var(--ink-soft);text-transform:uppercase;margin-top:2px;
+  }
+  .stat-strip{display:flex;gap:14px;margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;}
+  .stat-strip .s{color:var(--ink-soft);}
+  .stat-strip b{color:var(--ink);font-weight:600;}
+
+  /* MAIN */
+  main{flex:1;padding:14px 14px 8px;}
+  .section-title{
+    font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:1px;
+    font-size:13px;color:var(--ink-soft);margin:14px 4px 8px;font-weight:600;
+  }
+  input[type=text], input[type=number]{
+    font-family:'Inter',sans-serif;font-size:15px;padding:11px 13px;border-radius:8px;
+    border:1.5px solid var(--line);background:var(--card);color:var(--ink);width:100%;
+  }
+  input[type=text]:focus, input[type=number]:focus{outline:none;border-color:var(--ink);}
+
+  /* CATEGORY GROUP */
+  details.cat{
+    background:var(--card);border-radius:var(--radius);margin-bottom:10px;border:1.5px solid var(--line);
+    overflow:hidden;box-shadow:var(--shadow);
+  }
+  details.cat summary{
+    list-style:none;cursor:pointer;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:14.5px;letter-spacing:0.3px;
+  }
+  details.cat summary::-webkit-details-marker{display:none;}
+  summary .count{font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:11.5px;color:var(--ink-soft);}
+  summary .chev{transition:transform .2s ease;color:var(--ink-soft);font-size:12px;}
+  details[open] summary .chev{transform:rotate(90deg);}
+
+  .item-row{
+    display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px dashed var(--line);cursor:pointer;
+  }
+  .item-row:active{background:var(--paper-alt);}
+  .item-id{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);white-space:nowrap;}
+  .item-main{flex:1;min-width:0;}
+  .item-name{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .item-sub{font-size:11.5px;color:var(--ink-soft);}
+  .badge{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;padding:3px 7px;border-radius:5px;
+    white-space:nowrap;letter-spacing:0.5px;text-transform:uppercase;
+  }
+  .badge.in{background:var(--green-bg);color:var(--green);}
+  .badge.out{background:var(--rust-bg);color:var(--rust);}
+  .badge.stock{background:var(--blue-bg);color:var(--blue);}
+  .badge.low{background:var(--amber-bg);color:var(--amber);}
+
+  /* BOTTOM NAV */
+  nav.bottom{
+    position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;
+    background:var(--card);border-top:2px solid var(--ink);display:flex;z-index:30;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  nav.bottom button{
+    flex:1;background:none;border:none;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;
+    color:var(--ink-soft);font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:0.8px;text-transform:uppercase;font-weight:600;
+    cursor:pointer;
+  }
+  nav.bottom button.active{color:var(--ink);}
+  nav.bottom button svg{width:20px;height:20px;}
+  nav.bottom button .dot{width:4px;height:4px;border-radius:50%;background:var(--ink);opacity:0;margin-top:-1px;}
+  nav.bottom button.active .dot{opacity:1;}
+
+  /* FAB */
+  .fab{
+    position:fixed;right:calc(50% - 260px + 18px);bottom:calc(78px + env(safe-area-inset-bottom) + 14px);
+    width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--paper);border:none;
+    font-size:26px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;
+    box-shadow:0 3px 10px rgba(35,38,43,0.35);z-index:35;
+  }
+  @media (max-width:556px){
+    .fab{right:18px;}
+  }
+  .fab.hidden{display:none;}
+
+  /* STAMP */
+  .stamp{
+    display:inline-block;font-family:'Oswald',sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;
+    padding:5px 12px;border:2.5px solid currentColor;border-radius:6px;transform:rotate(-6deg);
+    text-transform:uppercase;
+  }
+  .stamp.in{color:var(--green);}
+  .stamp.out{color:var(--rust);}
+
+  /* SHEET / MODAL */
+  .overlay{
+    position:fixed;inset:0;background:rgba(20,20,15,0.45);z-index:50;display:flex;align-items:flex-end;justify-content:center;
+  }
+  .overlay.hidden{display:none;}
+  .sheet{
+    background:var(--paper);width:100%;max-width:520px;max-height:88vh;overflow-y:auto;
+    border-radius:18px 18px 0 0;border-top:2px solid var(--ink);padding:16px 18px 28px;
+    animation:slideup .22s ease;
+  }
+  @keyframes slideup{from{transform:translateY(24px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  .sheet-handle{width:38px;height:4px;background:var(--line);border-radius:3px;margin:0 auto 14px;}
+  .sheet-close{
+    position:absolute;top:14px;right:16px;background:none;border:none;font-size:22px;color:var(--ink-soft);cursor:pointer;line-height:1;
+  }
+  .tag-card{
+    background:var(--card);border:1.5px dashed var(--ink-soft);border-radius:10px;padding:18px;text-align:center;position:relative;margin-bottom:16px;
+  }
+  .tag-card .qr-box{display:flex;justify-content:center;margin-bottom:10px;}
+  .tag-card .qr-box img, .tag-card .qr-box canvas{image-rendering:pixelated;}
+  .tag-id{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;letter-spacing:1px;}
+  .tag-name{font-family:'Oswald',sans-serif;font-weight:600;font-size:17px;margin-top:4px;}
+  .tag-cat{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .info-box{background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;}
+  .info-box .lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace;}
+  .info-box .val{font-size:15px;font-weight:600;margin-top:2px;}
+
+  .btn{
+    font-family:'Oswald',sans-serif;font-weight:600;font-size:14px;letter-spacing:0.6px;text-transform:uppercase;
+    padding:13px;border-radius:8px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);width:100%;cursor:pointer;
+  }
+  .btn:active{opacity:0.8;}
+  .btn.ghost{background:none;color:var(--ink);}
+  .btn.green{background:var(--green);border-color:var(--green);color:#fff;}
+  .btn.rust{background:var(--rust);border-color:var(--rust);color:#fff;}
+  .btn.small{padding:8px;font-size:11.5px;width:auto;}
+
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--ink-soft);margin-bottom:5px;font-family:'IBM Plex Mono',monospace;}
+
+  .checkout-row{
+    background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px;
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+  }
+  .checkout-row .who{font-size:13.5px;font-weight:600;}
+  .checkout-row .meta{font-size:11px;color:var(--ink-soft);}
+
+  /* SCAN */
+  .scan-wrap{padding:14px;}
+  .scan-frame{
+    position:relative;border-radius:14px;overflow:hidden;border:2px solid var(--ink);aspect-ratio:1/1;background:#111;
+  }
+  .scan-frame video{width:100%;height:100%;object-fit:cover;display:block;}
+  .scan-corner-hint{
+    position:absolute;inset:12%;border:3px solid rgba(255,255,255,0.7);border-radius:12px;pointer-events:none;
+  }
+  .scan-msg{text-align:center;color:var(--ink-soft);font-size:13px;margin:14px 0;}
+  .manual-scan{margin-top:16px;display:flex;gap:8px;}
+  .manual-scan input{flex:1;}
+  .manual-scan button{width:auto;padding:11px 16px;}
+
+  /* PRINT */
+  .print-controls{display:flex;gap:8px;margin-bottom:14px;}
+  .label-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .label-card{
+    background:var(--card);border:1.5px dashed var(--ink-soft);border-radius:8px;padding:10px;text-align:center;
+  }
+  .label-card .qr-box{display:flex;justify-content:center;margin-bottom:6px;}
+  .label-card .lname{font-size:11px;font-weight:700;line-height:1.2;font-family:'Oswald',sans-serif;text-transform:uppercase;}
+  .label-card .lid{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-soft);margin-top:3px;}
+
+  /* ACTIVITY */
+  .log-row{
+    background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px;
+    display:flex;justify-content:space-between;gap:10px;
+  }
+  .log-left .log-item{font-size:13.5px;font-weight:600;}
+  .log-left .log-meta{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .log-right{text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);white-space:nowrap;}
+  .empty-state{text-align:center;padding:50px 20px;color:var(--ink-soft);}
+  .empty-state .big{font-family:'Oswald',sans-serif;font-size:16px;color:var(--ink);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+
+  .toast{
+    position:fixed;bottom:92px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);
+    padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:80;box-shadow:var(--shadow);
+    max-width:88%;text-align:center;
+  }
+
+  a.reset-link{font-size:11px;color:var(--ink-soft);text-decoration:underline;cursor:pointer;font-family:'IBM Plex Mono',monospace;}
+
+  @media print{
+    body{background:#fff;}
+    header.top, nav.bottom, .no-print{display:none !important;}
+    #app{padding-bottom:0;max-width:100%;}
+    main{padding:0;}
+    .label-grid{grid-template-columns:repeat(3,1fr);gap:8px;}
+    .label-card{break-inside:avoid;border:1px dashed #999;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="top">
+    <div class="brand-row">
+      <div class="brand">Inventory Manifest<small>IT Hardware Register</small></div>
+    </div>
+    <div class="stat-strip">
+      <div class="s">Items <b id="statTotal">-</b></div>
+      <div class="s">Units <b id="statUnits">-</b></div>
+      <div class="s">Checked Out <b id="statOut">-</b></div>
+    </div>
+  </header>
+
+  <main id="main"></main>
+
+  <nav class="bottom no-print">
+    <button data-tab="inventory" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/></svg>
+      <span>List</span><span class="dot"></span>
+    </button>
+    <button data-tab="scan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8V5a1 1 0 0 1 1-1h3M20 8V5a1 1 0 0 0-1-1h-3M4 16v3a1 1 0 0 0 1 1h3M20 16v3a1 1 0 0 1-1 1h-3M4 12h16"/></svg>
+      <span>Scan</span><span class="dot"></span>
+    </button>
+    <button data-tab="print">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-2M6 14h12v7H6z"/></svg>
+      <span>Labels</span><span class="dot"></span>
+    </button>
+    <button data-tab="activity">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>
+      <span>Activity</span><span class="dot"></span>
+    </button>
+  </nav>
+
+  <button class="fab no-print" id="addFab" title="Add item">+</button>
+  <div id="overlayRoot"></div>
+</div>
+
+<script>
+/* ============ SEED DATA ============ */
+const SEED_ITEMS = [{"id": "GPU-001", "category": "GPU", "brand": "EVGA", "model": "RTX 3070 Ti", "qty": 3, "type": "stock"}, {"id": "GPU-002", "category": "GPU", "brand": "MSI", "model": "RTX 4070 Ti", "qty": 1, "type": "unit"}, {"id": "GPU-003", "category": "GPU", "brand": "NVIDIA", "model": "RTX 4070 Super FE", "qty": 1, "type": "unit"}, {"id": "GPU-004", "category": "GPU", "brand": "NVIDIA", "model": "RTX 2080 FE", "qty": 1, "type": "unit"}, {"id": "GPU-005", "category": "GPU", "brand": "EVGA", "model": "RTX 3080 Ti", "qty": 1, "type": "unit"}, {"id": "GPU-006", "category": "GPU", "brand": "EVGA", "model": "GTX 1080 Ti", "qty": 2, "type": "stock"}, {"id": "GPU-007", "category": "GPU", "brand": "EVGA", "model": "GTX 1080", "qty": 1, "type": "unit"}, {"id": "GPU-008", "category": "GPU", "brand": "EVGA", "model": "GeForce 980 Ti", "qty": 5, "type": "stock"}, {"id": "GPU-009", "category": "GPU", "brand": "EVGA", "model": "GeForce 960", "qty": 1, "type": "unit"}, {"id": "GPU-010", "category": "GPU", "brand": "MSI", "model": "GeForce GTX 1080", "qty": 4, "type": "stock"}, {"id": "GPU-011", "category": "GPU", "brand": "EVGA", "model": "GeForce GTX 1070", "qty": 2, "type": "stock"}, {"id": "GPU-012", "category": "GPU", "brand": "NVIDIA", "model": "SLI Bridge", "qty": 2, "type": "stock"}, {"id": "GPU-013", "category": "GPU", "brand": "MSI", "model": "GeForce GTX 1080 Ti", "qty": 1, "type": "unit"}, {"id": "GPU-014", "category": "GPU", "brand": "NVIDIA", "model": "GTX Titan (Pascal-gen)", "qty": 1, "type": "unit"}, {"id": "GPU-015", "category": "GPU", "brand": "NVIDIA", "model": "GTX 1080 FE", "qty": 1, "type": "unit"}, {"id": "CPU-001", "category": "CPU", "brand": "Intel", "model": "Core i9-10900K", "qty": 1, "type": "unit"}, {"id": "CPU-002", "category": "CPU", "brand": "Intel", "model": "Core i7-6800K", "qty": 1, "type": "unit"}, {"id": "CPU-003", "category": "CPU", "brand": "Intel", "model": "Core i7-6900K", "qty": 1, "type": "unit"}, {"id": "CPU-004", "category": "CPU", "brand": "Intel", "model": "Core i7-6700K", "qty": 11, "type": "stock"}, {"id": "MOT-001", "category": "Motherboard", "brand": "ASUS", "model": "Pro Z590-V", "qty": 1, "type": "unit"}, {"id": "MOT-002", "category": "Motherboard", "brand": "ASUS", "model": "WS C621E SAGE", "qty": 1, "type": "unit"}, {"id": "MOT-003", "category": "Motherboard", "brand": "ASUS", "model": "Prime B550-PLUS AMD", "qty": 1, "type": "unit"}, {"id": "MOT-004", "category": "Motherboard", "brand": "ASUS", "model": "Maximus X Hero", "qty": 1, "type": "unit"}, {"id": "MOT-005", "category": "Motherboard", "brand": "MSI", "model": "X99A GODLIKE GAMING", "qty": 1, "type": "unit"}, {"id": "MOT-006", "category": "Motherboard", "brand": "ASUS", "model": "Sabertooth Z170", "qty": 1, "type": "unit"}, {"id": "MOT-007", "category": "Motherboard", "brand": "ASUS", "model": "Sabertooth X99", "qty": 2, "type": "stock"}, {"id": "MOT-008", "category": "Motherboard", "brand": "ASUS", "model": "ROG Strix Z490-I Gaming (Damaged)", "qty": 1, "type": "unit"}, {"id": "MEM-001", "category": "Memory (RAM)", "brand": "Corsair", "model": "Vengeance LPX DDR4 16GB Module", "qty": 12, "type": "stock"}, {"id": "MEM-002", "category": "Memory (RAM)", "brand": "Corsair", "model": "Vengeance LPX DDR4 4GB Module", "qty": 20, "type": "stock"}, {"id": "MEM-003", "category": "Memory (RAM)", "brand": "Corsair", "model": "RGB 64GB Kit", "qty": 4, "type": "stock"}, {"id": "MEM-004", "category": "Memory (RAM)", "brand": "Kingston", "model": "FURY HyperX DDR4 8GB Module", "qty": 5, "type": "stock"}, {"id": "MEM-005", "category": "Memory (RAM)", "brand": "Corsair", "model": "Vengeance LPX DDR4 8GB Module", "qty": 6, "type": "stock"}, {"id": "MEM-006", "category": "Memory (RAM)", "brand": "G.Skill", "model": "Trident Z Neo 16GB Module", "qty": 2, "type": "stock"}, {"id": "POW-001", "category": "Power - UPS", "brand": "EVGA", "model": "750W Gold PSU", "qty": 1, "type": "unit"}, {"id": "POW-002", "category": "Power - UPS", "brand": "EVGA", "model": "850W Gold PSU", "qty": 1, "type": "unit"}, {"id": "POW-003", "category": "Power - UPS", "brand": "EVGA", "model": "Supernova 1000W P2 Platinum PSU", "qty": 1, "type": "unit"}, {"id": "POW-004", "category": "Power - UPS", "brand": "SilverStone", "model": "SX700 Platinum PSU", "qty": 2, "type": "stock"}, {"id": "POW-005", "category": "Power - UPS", "brand": "APC", "model": "Smart-UPS C1500", "qty": 2, "type": "stock"}, {"id": "MON-001", "category": "Monitor", "brand": "LG", "model": "27GN800-B", "qty": 12, "type": "stock"}, {"id": "MON-002", "category": "Monitor", "brand": "ASUS", "model": "MX27A", "qty": 1, "type": "unit"}, {"id": "MON-003", "category": "Monitor", "brand": "ASUS", "model": "VG278", "qty": 2, "type": "stock"}, {"id": "MON-004", "category": "Monitor", "brand": "Samsung", "model": "C49RG90SSN", "qty": 1, "type": "unit"}, {"id": "MON-005", "category": "Monitor", "brand": "ASUS", "model": "XG349", "qty": 3, "type": "stock"}, {"id": "MON-006", "category": "Monitor", "brand": "ASUS", "model": "TUF Gaming VG27UQ1A", "qty": 5, "type": "stock"}, {"id": "MON-007", "category": "Monitor", "brand": "ASUS", "model": "VG27AQL3A", "qty": 1, "type": "unit"}, {"id": "KEY-001", "category": "Keyboard - Peripheral", "brand": "Red Thunder", "model": "Gaming Keyboard", "qty": 7, "type": "stock"}, {"id": "HEA-001", "category": "Headphones - Audio", "brand": "AKG", "model": "K240 Studio", "qty": 1, "type": "unit"}, {"id": "HEA-002", "category": "Headphones - Audio", "brand": "Astro Gaming", "model": "TR A40", "qty": 7, "type": "stock"}, {"id": "HEA-003", "category": "Headphones - Audio", "brand": "Astro Gaming", "model": "A10", "qty": 2, "type": "stock"}, {"id": "HEA-004", "category": "Headphones - Audio", "brand": "Shure", "model": "SM7B", "qty": 2, "type": "stock"}, {"id": "HEA-005", "category": "Headphones - Audio", "brand": "Rode", "model": "NTG2", "qty": 1, "type": "unit"}, {"id": "HEA-006", "category": "Headphones - Audio", "brand": "Maono", "model": "DGM20", "qty": 3, "type": "stock"}, {"id": "HEA-007", "category": "Headphones - Audio", "brand": "Audio-Technica", "model": "AT2020", "qty": 7, "type": "stock"}, {"id": "HEA-008", "category": "Headphones - Audio", "brand": "Sennheiser", "model": "MKH 418 P48", "qty": 1, "type": "unit"}, {"id": "HEA-009", "category": "Headphones - Audio", "brand": "Audient", "model": "iD14", "qty": 1, "type": "unit"}, {"id": "HEA-010", "category": "Headphones - Audio", "brand": "Focusrite", "model": "Scarlett Solo USB Interface", "qty": 2, "type": "stock"}, {"id": "HEA-011", "category": "Headphones - Audio", "brand": "Saramonic", "model": "UltraCompact 2.4GHz Dual-Channel Wireless Mic System w/ Lavalier", "qty": 1, "type": "unit"}, {"id": "HEA-012", "category": "Headphones - Audio", "brand": "Bose", "model": "Companion 20 Speaker Set", "qty": 1, "type": "unit"}, {"id": "HEA-013", "category": "Headphones - Audio", "brand": "Pro Line", "model": "Mini Boom Mic Stand", "qty": 3, "type": "stock"}, {"id": "HEA-014", "category": "Headphones - Audio", "brand": "Beyerdynamic", "model": "DT 770", "qty": 2, "type": "stock"}, {"id": "HEA-015", "category": "Headphones - Audio", "brand": "Sennheiser", "model": "EK 100 Bodypack Transmitter", "qty": 5, "type": "stock"}, {"id": "CAM-001", "category": "Camera", "brand": "Canon", "model": "Rebel T7", "qty": 2, "type": "stock"}, {"id": "CAM-002", "category": "Camera", "brand": "Canon", "model": "EOS 80D", "qty": 1, "type": "unit"}, {"id": "CAM-003", "category": "Camera", "brand": "Canon", "model": "Camera Battery Charger", "qty": 3, "type": "stock"}, {"id": "VR-001", "category": "VR", "brand": "HTC", "model": "Vive Headset", "qty": 4, "type": "stock"}, {"id": "VR-002", "category": "VR", "brand": "HTC", "model": "Vive Tracker", "qty": 6, "type": "stock"}, {"id": "VR-003", "category": "VR", "brand": "HTC", "model": "Vive Controller", "qty": 5, "type": "stock"}, {"id": "VR-004", "category": "VR", "brand": "HTC", "model": "Vive Base Station", "qty": 7, "type": "stock"}, {"id": "VID-001", "category": "Video - AV", "brand": "ZetaGuard", "model": "4x1 HDMI Switch", "qty": 1, "type": "unit"}, {"id": "CAB-001", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "HDMI Cable", "qty": 34, "type": "stock"}, {"id": "CAB-002", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "DisplayPort Cable", "qty": 23, "type": "stock"}, {"id": "CAB-003", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "Mini HDMI to HDMI Cable", "qty": 2, "type": "stock"}, {"id": "CAB-004", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "USB-C to HDMI Cable", "qty": 2, "type": "stock"}, {"id": "CAB-005", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "USB-C to HDMI Converter", "qty": 1, "type": "unit"}, {"id": "CAB-006", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "3.5mm to 1/4\" Adapter", "qty": 2, "type": "stock"}, {"id": "CAB-007", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "Ethernet Cable (100 ft)", "qty": 2, "type": "stock"}, {"id": "CAB-008", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "Ethernet Cable (10 ft)", "qty": 3, "type": "stock"}, {"id": "CAB-009", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "Ethernet Cable (50 ft)", "qty": 2, "type": "stock"}, {"id": "CAB-010", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "Ethernet Cable (1.5 ft)", "qty": 1, "type": "unit"}, {"id": "CAB-011", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "USB-A Extender", "qty": 35, "type": "stock"}, {"id": "CAB-012", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "USB-A Female Plug", "qty": 34, "type": "stock"}, {"id": "CAB-013", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "IEC Clover Power Cable", "qty": 1, "type": "unit"}, {"id": "CAB-014", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "IEC 2-Prong Power Cable", "qty": 1, "type": "unit"}, {"id": "CAB-015", "category": "Cables & Adapters", "brand": "LG", "model": "Monitor AC Adapter", "qty": 3, "type": "stock"}, {"id": "CAB-016", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "IEC Power Cable", "qty": 19, "type": "stock"}, {"id": "CAB-017", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "Digital Fiber Optic Audio Cable", "qty": 15, "type": "stock"}, {"id": "CAB-018", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "3.5mm Audio Cable", "qty": 5, "type": "stock"}, {"id": "CAB-019", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "3.5mm Extension Cable", "qty": 13, "type": "stock"}, {"id": "CAB-020", "category": "Cables & Adapters", "brand": "Unbranded/Generic", "model": "3.5mm to RCA Female Adapter", "qty": 2, "type": "stock"}, {"id": "CAS-001", "category": "Case", "brand": "Corsair", "model": "5000D Airflow", "qty": 5, "type": "stock"}, {"id": "NET-001", "category": "Networking", "brand": "Unbranded/Generic", "model": "PCIe x8 10G Dual Port Ethernet Server Adapter", "qty": 1, "type": "unit"}, {"id": "NET-002", "category": "Networking", "brand": "ASUS", "model": "10-Gigabit XG-C100C PCI-E Network Adapter", "qty": 4, "type": "stock"}, {"id": "NET-003", "category": "Networking", "brand": "TP-Link", "model": "TL-SG108 (8-Port Gigabit Desktop Switch)", "qty": 8, "type": "stock"}, {"id": "NET-004", "category": "Networking", "brand": "TP-Link", "model": "TL-SG105 (5-Port Gigabit Desktop Switch)", "qty": 8, "type": "stock"}, {"id": "STO-001", "category": "Storage", "brand": "Samsung", "model": "860 EVO V-NAND SSD", "qty": 1, "type": "unit"}, {"id": "CAP-001", "category": "Capture Card", "brand": "Elgato", "model": "4K60 Pro PCIe", "qty": 1, "type": "unit"}, {"id": "CAP-002", "category": "Capture Card", "brand": "Elgato", "model": "Cam Link 4K", "qty": 1, "type": "unit"}, {"id": "COO-001", "category": "Cooling", "brand": "Cooler Master", "model": "Hyper 212", "qty": 5, "type": "stock"}]
+;
+
+/* ============ STATE ============ */
+let STATE = null;
+let currentTab = 'inventory';
+let scanStream = null;
+let scanRAF = null;
+
+function defaultRuntime(item){
+  if(item.type === 'unit'){
+    return {status:'in', holder:null, purpose:null, since:null};
+  } else {
+    return {available:item.qty, checkouts:[]};
+  }
+}
+
+/* ============ STORAGE ADAPTER (works inside Claude, and standalone) ============ */
+const hasClaudeStorage = typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function';
+
+async function storageGet(key){
+  if(hasClaudeStorage){
+    try{ return await window.storage.get(key, false); }
+    catch(e){ return null; }
+  }
+  try{
+    const raw = localStorage.getItem(key);
+    return raw === null ? null : {key, value: raw};
+  }catch(e){ return null; }
+}
+
+async function storageSet(key, value){
+  if(hasClaudeStorage){
+    try{ return await window.storage.set(key, value, false); }
+    catch(e){ return null; }
+  }
+  try{
+    localStorage.setItem(key, value);
+    return {key, value};
+  }catch(e){ return null; }
+}
+
+async function loadState(){
+  const res = await storageGet('inventory-state');
+  if(res && res.value){
+    try{ STATE = JSON.parse(res.value); return; }catch(e){ /* fall through to reseed */ }
+  }
+  const items = SEED_ITEMS.map(it => Object.assign({}, it, defaultRuntime(it)));
+  STATE = {items, log:[]};
+  await persist();
+}
+
+async function persist(){
+  await storageSet('inventory-state', JSON.stringify(STATE));
+}
+
+function findItem(id){
+  return STATE.items.find(i => i.id.toLowerCase() === String(id).toLowerCase());
+}
+
+function uid(){ return Math.random().toString(36).slice(2,9); }
+
+function nowStr(){
+  const d = new Date();
+  return d.toLocaleDateString(undefined,{month:'short',day:'numeric'}) + ' · ' + d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+}
+
+/* ============ TOAST ============ */
+function toast(msg){
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 2200);
+}
+
+/* ============ RENDER: STATS ============ */
+function renderStats(){
+  const total = STATE.items.length;
+  const units = STATE.items.reduce((a,i)=>a+i.qty,0);
+  let out = 0;
+  STATE.items.forEach(i=>{
+    if(i.type==='unit' && i.status==='out') out += 1;
+    if(i.type==='stock') out += (i.checkouts||[]).reduce((a,c)=>a+c.qty,0);
+  });
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statUnits').textContent = units;
+  document.getElementById('statOut').textContent = out;
+}
+
+/* ============ TAB SWITCH ============ */
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('nav.bottom button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  render();
+  stopScan();
+  if(tab === 'scan') startScanUI();
+  document.getElementById('addFab').classList.toggle('hidden', tab !== 'inventory');
+}
+
+document.querySelectorAll('nav.bottom button').forEach(b=>{
+  b.addEventListener('click', ()=>switchTab(b.dataset.tab));
+});
+
+/* ============ MAIN RENDER ROUTER ============ */
+function render(){
+  renderStats();
+  const main = document.getElementById('main');
+  if(currentTab === 'inventory') return renderInventory(main);
+  if(currentTab === 'scan') return renderScan(main);
+  if(currentTab === 'print') return renderPrint(main);
+  if(currentTab === 'activity') return renderActivity(main);
+}
+
+/* ============ INVENTORY TAB ============ */
+let searchQuery = '';
+function renderInventory(main){
+  const byCat = {};
+  STATE.items.forEach(it=>{
+    const q = searchQuery.trim().toLowerCase();
+    if(q){
+      const hay = (it.id+' '+it.brand+' '+it.model+' '+it.category).toLowerCase();
+      if(!hay.includes(q)) return;
+    }
+    (byCat[it.category] = byCat[it.category] || []).push(it);
+  });
+
+  let html = `<input type="text" id="searchBox" placeholder="Search brand, model, or ID..." value="${escapeHtml(searchQuery)}">`;
+
+  const cats = Object.keys(byCat);
+  if(cats.length === 0){
+    html += `<div class="empty-state"><div class="big">No matches</div>Try a different search term.</div>`;
+  }
+  cats.forEach(cat=>{
+    const items = byCat[cat];
+    html += `<details class="cat" open><summary><span>${escapeHtml(cat)}</span><span style="display:flex;align-items:center;gap:8px;"><span class="count">${items.length} SKU</span><span class="chev">&#9656;</span></span></summary>`;
+    items.forEach(it=>{
+      let badge = '';
+      if(it.type==='unit'){
+        badge = it.status==='out' ? `<span class="badge out">Out</span>` : `<span class="badge in">In</span>`;
+      } else {
+        const low = it.available <= Math.ceil(it.qty*0.2) && it.available < it.qty;
+        badge = `<span class="badge ${low?'low':'stock'}">${it.available}/${it.qty}</span>`;
+      }
+      html += `<div class="item-row" data-id="${it.id}">
+        <div class="item-main">
+          <div class="item-name">${escapeHtml(it.brand)} ${escapeHtml(it.model)}</div>
+          <div class="item-sub item-id">${it.id}</div>
+        </div>
+        ${badge}
+      </div>`;
+    });
+    html += `</details>`;
+  });
+
+  main.innerHTML = html;
+  const sb = document.getElementById('searchBox');
+  sb.addEventListener('input', (e)=>{ searchQuery = e.target.value; renderInventory(main); sb.focus(); sb.setSelectionRange(sb.value.length, sb.value.length); });
+  main.querySelectorAll('.item-row').forEach(row=>{
+    row.addEventListener('click', ()=>openDetail(row.dataset.id));
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ============ ITEM DETAIL SHEET ============ */
+function openDetail(id){
+  const it = findItem(id);
+  if(!it){ toast('Item not found: '+id); return; }
+  const root = document.getElementById('overlayRoot');
+
+  let statusBlock = '';
+  if(it.type === 'unit'){
+    if(it.status === 'in'){
+      statusBlock = `
+        <div style="text-align:center;margin-bottom:14px;"><span class="stamp in">In Stock</span></div>
+        <button class="btn green" id="doCheckout">Check Out</button>`;
+    } else {
+      statusBlock = `
+        <div style="text-align:center;margin-bottom:14px;"><span class="stamp out">Checked Out</span></div>
+        <div class="info-grid">
+          <div class="info-box"><div class="lbl">Holder</div><div class="val">${escapeHtml(it.holder||'-')}</div></div>
+          <div class="info-box"><div class="lbl">Since</div><div class="val" style="font-size:12.5px;">${escapeHtml(it.since||'-')}</div></div>
+        </div>
+        ${it.purpose ? `<div class="info-box" style="margin-bottom:16px;"><div class="lbl">Purpose</div><div class="val" style="font-size:13.5px;">${escapeHtml(it.purpose)}</div></div>` : ''}
+        <button class="btn rust" id="doCheckin">Check In</button>`;
+    }
+  } else {
+    const openList = (it.checkouts||[]).map(c => `
+      <div class="checkout-row">
+        <div>
+          <div class="who">${escapeHtml(c.holder)} <span style="color:var(--ink-soft);font-weight:400;">× ${c.qty}</span></div>
+          <div class="meta">${escapeHtml(c.purpose||'')} · ${escapeHtml(c.since)}</div>
+        </div>
+        <button class="btn small rust" data-return="${c.id}">Return</button>
+      </div>`).join('');
+    statusBlock = `
+      <div class="info-grid">
+        <div class="info-box"><div class="lbl">Available</div><div class="val" style="color:${it.available>0?'var(--green)':'var(--rust)'}">${it.available}</div></div>
+        <div class="info-box"><div class="lbl">Total</div><div class="val">${it.qty}</div></div>
+      </div>
+      <button class="btn green" id="doStockOut" ${it.available<=0?'disabled style="opacity:.4"':''}>Check Out</button>
+      ${openList ? `<div class="section-title" style="margin-left:0;">Currently Out</div>${openList}` : ''}
+    `;
+  }
+
+  root.innerHTML = `
+    <div class="overlay" id="detailOverlay">
+      <div class="sheet" style="position:relative;">
+        <button class="sheet-close" id="closeDetail">&times;</button>
+        <div class="sheet-handle"></div>
+        <div class="tag-card">
+          <div class="qr-box" id="qrTarget"></div>
+          <div class="tag-id">${it.id}</div>
+          <div class="tag-name">${escapeHtml(it.brand)} ${escapeHtml(it.model)}</div>
+          <div class="tag-cat">${escapeHtml(it.category)}</div>
+        </div>
+        ${statusBlock}
+      </div>
+    </div>`;
+
+  renderQR(document.getElementById('qrTarget'), it.id, 150);
+
+  document.getElementById('detailOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'detailOverlay') closeDetail();
+  });
+  document.getElementById('closeDetail').addEventListener('click', closeDetail);
+
+  const co = document.getElementById('doCheckout');
+  if(co) co.addEventListener('click', ()=>openCheckoutForm(it, 'unit'));
+  const ci = document.getElementById('doCheckin');
+  if(ci) ci.addEventListener('click', ()=>{ checkInUnit(it); closeDetail(); });
+  const so = document.getElementById('doStockOut');
+  if(so) so.addEventListener('click', ()=>openCheckoutForm(it, 'stock'));
+  root.querySelectorAll('[data-return]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      returnStock(it, btn.dataset.return);
+      openDetail(it.id);
+    });
+  });
+}
+
+function closeDetail(){
+  document.getElementById('overlayRoot').innerHTML = '';
+}
+
+function renderQR(container, text, size){
+  container.innerHTML = '';
+  new QRCode(container, {
+    text: text, width: size, height: size,
+    colorDark:'#23262B', colorLight:'#FBFAF5',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+}
+
+/* ============ CHECKOUT FORM ============ */
+function openCheckoutForm(it, mode){
+  const root = document.getElementById('overlayRoot');
+  const qtyField = mode === 'stock' ? `
+    <div class="field">
+      <label>Quantity (max ${it.available})</label>
+      <input type="number" id="foQty" min="1" max="${it.available}" value="1">
+    </div>` : '';
+  root.innerHTML = `
+    <div class="overlay" id="formOverlay">
+      <div class="sheet" style="position:relative;">
+        <button class="sheet-close" id="closeForm">&times;</button>
+        <div class="sheet-handle"></div>
+        <div class="section-title" style="margin-top:0;">Check Out &mdash; ${it.id}</div>
+        ${qtyField}
+        <div class="field">
+          <label>Held by</label>
+          <input type="text" id="foHolder" placeholder="Name">
+        </div>
+        <div class="field">
+          <label>Purpose / destination</label>
+          <input type="text" id="foPurpose" placeholder="e.g. Stream setup, Room 4">
+        </div>
+        <button class="btn green" id="foSubmit">Confirm Check Out</button>
+      </div>
+    </div>`;
+  document.getElementById('formOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'formOverlay') closeDetail();
+  });
+  document.getElementById('closeForm').addEventListener('click', ()=>openDetail(it.id));
+  document.getElementById('foSubmit').addEventListener('click', ()=>{
+    const holder = document.getElementById('foHolder').value.trim();
+    const purpose = document.getElementById('foPurpose').value.trim();
+    if(!holder){ toast('Enter who is holding this item'); return; }
+    if(mode === 'unit'){
+      checkOutUnit(it, holder, purpose);
+    } else {
+      const qty = parseInt(document.getElementById('foQty').value, 10) || 1;
+      if(qty < 1 || qty > it.available){ toast('Invalid quantity'); return; }
+      checkOutStock(it, qty, holder, purpose);
+    }
+    openDetail(it.id);
+  });
+}
+
+/* ============ CHECK IN/OUT LOGIC ============ */
+async function checkOutUnit(it, holder, purpose){
+  it.status = 'out'; it.holder = holder; it.purpose = purpose; it.since = nowStr();
+  STATE.log.unshift({ts:Date.now(), tsStr:nowStr(), itemId:it.id, itemName:it.brand+' '+it.model, action:'check_out', qty:1, holder, purpose});
+  await persist(); render();
+  toast(`${it.id} checked out to ${holder}`);
+}
+async function checkInUnit(it){
+  STATE.log.unshift({ts:Date.now(), tsStr:nowStr(), itemId:it.id, itemName:it.brand+' '+it.model, action:'check_in', qty:1, holder:it.holder, purpose:it.purpose});
+  it.status = 'in'; it.holder = null; it.purpose = null; it.since = null;
+  await persist(); render();
+  toast(`${it.id} checked in`);
+}
+async function checkOutStock(it, qty, holder, purpose){
+  it.available -= qty;
+  it.checkouts = it.checkouts || [];
+  it.checkouts.push({id:uid(), qty, holder, purpose, since:nowStr()});
+  STATE.log.unshift({ts:Date.now(), tsStr:nowStr(), itemId:it.id, itemName:it.brand+' '+it.model, action:'check_out', qty, holder, purpose});
+  await persist(); render();
+  toast(`${qty} × ${it.id} checked out to ${holder}`);
+}
+async function returnStock(it, checkoutId){
+  const idx = (it.checkouts||[]).findIndex(c=>c.id===checkoutId);
+  if(idx === -1) return;
+  const c = it.checkouts[idx];
+  it.available += c.qty;
+  it.checkouts.splice(idx,1);
+  STATE.log.unshift({ts:Date.now(), tsStr:nowStr(), itemId:it.id, itemName:it.brand+' '+it.model, action:'check_in', qty:c.qty, holder:c.holder, purpose:c.purpose});
+  await persist(); render();
+  toast(`${c.qty} × ${it.id} returned`);
+}
+
+/* ============ ADD ITEM ============ */
+function categoryPrefix(category){
+  let base = category.trim().slice(0,3).toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(base.length === 0) base = 'GEN';
+  while(base.length < 3) base += 'X';
+  return base;
+}
+function nextIdForCategory(category){
+  const prefix = categoryPrefix(category);
+  let max = 0;
+  STATE.items.forEach(it=>{
+    if(it.id.startsWith(prefix+'-')){
+      const n = parseInt(it.id.split('-')[1], 10);
+      if(!isNaN(n) && n > max) max = n;
+    }
+  });
+  const next = max + 1;
+  return prefix + '-' + String(next).padStart(3,'0');
+}
+
+function openAddItemForm(){
+  const root = document.getElementById('overlayRoot');
+  const existingCats = Array.from(new Set(STATE.items.map(i=>i.category))).sort();
+  root.innerHTML = `
+    <div class="overlay" id="addOverlay">
+      <div class="sheet" style="position:relative;">
+        <button class="sheet-close" id="closeAdd">&times;</button>
+        <div class="sheet-handle"></div>
+        <div class="section-title" style="margin-top:0;">Add Item to Inventory</div>
+        <div class="field">
+          <label>Category</label>
+          <input type="text" id="aiCategory" list="catList" placeholder="e.g. GPU, or a new category">
+          <datalist id="catList">
+            ${existingCats.map(c=>`<option value="${escapeHtml(c)}">`).join('')}
+          </datalist>
+        </div>
+        <div class="field">
+          <label>Brand</label>
+          <input type="text" id="aiBrand" placeholder="e.g. ASUS">
+        </div>
+        <div class="field">
+          <label>Model / Description</label>
+          <input type="text" id="aiModel" placeholder="e.g. TUF Gaming VG27UQ1A">
+        </div>
+        <div class="field">
+          <label>Quantity</label>
+          <input type="number" id="aiQty" min="1" value="1">
+        </div>
+        <div class="scan-msg" style="text-align:left;margin:0 0 14px;">Qty of 1 gets individual in/out tracking. Qty above 1 becomes a shared stock item.</div>
+        <button class="btn green" id="aiSubmit">Add Item</button>
+      </div>
+    </div>`;
+  document.getElementById('addOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'addOverlay') closeDetail();
+  });
+  document.getElementById('closeAdd').addEventListener('click', closeDetail);
+  document.getElementById('aiSubmit').addEventListener('click', async ()=>{
+    const category = document.getElementById('aiCategory').value.trim();
+    const brand = document.getElementById('aiBrand').value.trim();
+    const model = document.getElementById('aiModel').value.trim();
+    const qty = parseInt(document.getElementById('aiQty').value, 10);
+    if(!category || !brand || !model){ toast('Fill in category, brand, and model'); return; }
+    if(!qty || qty < 1){ toast('Quantity must be at least 1'); return; }
+    const id = nextIdForCategory(category);
+    const type = qty === 1 ? 'unit' : 'stock';
+    const newItem = Object.assign({id, category, brand, model, qty, type}, defaultRuntime({type, qty}));
+    STATE.items.push(newItem);
+    await persist();
+    closeDetail();
+    render();
+    toast(`Added ${id}`);
+    openDetail(id);
+  });
+}
+
+document.getElementById('addFab').addEventListener('click', openAddItemForm);
+
+/* ============ SCAN TAB ============ */
+function renderScan(main){
+  main.innerHTML = `
+    <div class="scan-wrap">
+      <div class="scan-frame" id="scanFrame">
+        <video id="scanVideo" autoplay playsinline muted></video>
+        <div class="scan-corner-hint"></div>
+      </div>
+      <div class="scan-msg" id="scanMsg">Point the camera at an item's QR label.</div>
+      <div class="manual-scan">
+        <input type="text" id="manualId" placeholder="Or enter item ID, e.g. GPU-004">
+        <button class="btn small" id="manualGo">Go</button>
+      </div>
+    </div>`;
+  document.getElementById('manualGo').addEventListener('click', ()=>{
+    const val = document.getElementById('manualId').value.trim();
+    if(!val) return;
+    const it = findItem(val);
+    if(it){ openDetail(it.id); } else { toast('No item with ID '+val); }
+  });
+  document.getElementById('manualId').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter') document.getElementById('manualGo').click();
+  });
+}
+
+async function startScanUI(){
+  const video = document.getElementById('scanVideo');
+  const msg = document.getElementById('scanMsg');
+  if(!video) return;
+  try{
+    scanStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    video.srcObject = scanStream;
+    await video.play();
+    msg.textContent = 'Scanning...';
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d', {willReadFrequently:true});
+    let lastHit = 0;
+    function tick(){
+      if(!video.videoWidth){ scanRAF = requestAnimationFrame(tick); return; }
+      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+      const code = jsQR(imgData.data, imgData.width, imgData.height, {inversionAttempts:'dontInvert'});
+      if(code && code.data && Date.now() - lastHit > 1500){
+        const it = findItem(code.data);
+        if(it){
+          lastHit = Date.now();
+          openDetail(it.id);
+        }
+      }
+      scanRAF = requestAnimationFrame(tick);
+    }
+    scanRAF = requestAnimationFrame(tick);
+  }catch(e){
+    if(msg) msg.textContent = 'Camera unavailable — use manual entry below, or check browser permissions.';
+  }
+}
+
+function stopScan(){
+  if(scanRAF) cancelAnimationFrame(scanRAF);
+  scanRAF = null;
+  if(scanStream){
+    scanStream.getTracks().forEach(t=>t.stop());
+    scanStream = null;
+  }
+}
+
+/* ============ PRINT TAB ============ */
+function renderPrint(main){
+  main.innerHTML = `
+    <div class="print-controls no-print">
+      <button class="btn" id="doPrint" style="width:auto;padding:11px 18px;">Print All Labels</button>
+      <div style="align-self:center;font-size:12px;color:var(--ink-soft);">${STATE.items.length} labels</div>
+    </div>
+    <div class="label-grid" id="labelGrid"></div>
+  `;
+  document.getElementById('doPrint').addEventListener('click', ()=>window.print());
+  const grid = document.getElementById('labelGrid');
+  STATE.items.forEach(it=>{
+    const card = document.createElement('div');
+    card.className = 'label-card';
+    card.innerHTML = `<div class="qr-box" id="qr-${it.id}"></div><div class="lname">${escapeHtml(it.brand)} ${escapeHtml(it.model)}</div><div class="lid">${it.id}</div>`;
+    grid.appendChild(card);
+  });
+  STATE.items.forEach(it=>{
+    renderQR(document.getElementById('qr-'+it.id), it.id, 90);
+  });
+}
+
+/* ============ ACTIVITY TAB ============ */
+function renderActivity(main){
+  if(STATE.log.length === 0){
+    main.innerHTML = `<div class="empty-state"><div class="big">No activity yet</div>Check an item in or out to see it logged here.</div>
+      <div class="no-print" style="text-align:center;margin-top:20px;"><a class="reset-link" id="resetLink">Reset to original inventory</a></div>`;
+  } else {
+    let html = '';
+    STATE.log.forEach(l=>{
+      const actionLabel = l.action === 'check_out' ? 'Checked Out' : 'Checked In';
+      const color = l.action === 'check_out' ? 'var(--rust)' : 'var(--green)';
+      html += `<div class="log-row">
+        <div class="log-left">
+          <div class="log-item">${escapeHtml(l.itemName)} <span style="color:var(--ink-soft);font-weight:400;font-family:'IBM Plex Mono',monospace;font-size:11px;">${l.itemId}</span></div>
+          <div class="log-meta">${escapeHtml(l.holder||'')} ${l.qty>1?'× '+l.qty:''} ${l.purpose?'· '+escapeHtml(l.purpose):''}</div>
+        </div>
+        <div class="log-right">
+          <div style="color:${color};font-weight:600;">${actionLabel}</div>
+          <div>${l.tsStr}</div>
+        </div>
+      </div>`;
+    });
+    html += `<div class="no-print" style="text-align:center;margin-top:16px;"><a class="reset-link" id="resetLink">Reset to original inventory</a></div>`;
+    main.innerHTML = html;
+  }
+  const rl = document.getElementById('resetLink');
+  if(rl) rl.addEventListener('click', resetInventory);
+}
+
+async function resetInventory(){
+  if(!confirm('This clears all check-out history and restores original quantities. Continue?')) return;
+  const items = SEED_ITEMS.map(it => Object.assign({}, it, defaultRuntime(it)));
+  STATE = {items, log:[]};
+  await persist();
+  render();
+  toast('Inventory reset');
+}
+
+/* ============ INIT ============ */
+(async function init(){
+  await loadState();
+  render();
+  if(!hasClaudeStorage && 'serviceWorker' in navigator){
+    // Only register when hosted standalone (Claude's artifact sandbox doesn't allow this).
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
+})();
+</script>
+</body>
+</html>
