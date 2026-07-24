@@ -828,6 +828,11 @@ function renderScan(main){
         <input type="text" id="manualId" placeholder="Or enter item ID, e.g. GPU-004">
         <button class="btn small" id="manualGo">Go</button>
       </div>
+      <div style="margin-top:18px;border-top:1px dashed var(--line);padding-top:12px;">
+        <div style="font-size:11px;color:var(--ink-soft);font-weight:700;margin-bottom:6px;">DEBUG PREVIEW — what the scanner is capturing:</div>
+        <canvas id="debugCanvas" style="width:100%;max-width:280px;border-radius:8px;border:1px solid var(--line);display:block;"></canvas>
+        <div id="debugInfo" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);margin-top:6px;">waiting...</div>
+      </div>
     </div>`;
   document.getElementById('manualGo').addEventListener('click', ()=>{
     const val = document.getElementById('manualId').value.trim();
@@ -855,7 +860,12 @@ async function startScanUI(){
       msg.textContent = 'Camera preview works, but this browser can\'t process frames — try manual entry below.';
       return;
     }
+    const debugCanvas = document.getElementById('debugCanvas');
+    const debugCtx = debugCanvas ? debugCanvas.getContext('2d') : null;
+    const debugInfo = document.getElementById('debugInfo');
     let lastHit = 0;
+    let frameCount = 0;
+    let errorCount = 0;
     const MAX_DIM = 900; // cap resolution: faster + more reliable getImageData on iOS
     function tick(){
       try{
@@ -868,6 +878,16 @@ async function startScanUI(){
         ctx.drawImage(video, 0, 0, w, h);
         const imgData = ctx.getImageData(0,0,w,h);
         const code = jsQR(imgData.data, imgData.width, imgData.height, {inversionAttempts:'attemptBoth'});
+        frameCount++;
+        if(frameCount % 10 === 0){
+          if(debugCanvas && debugCtx){
+            debugCanvas.width = w; debugCanvas.height = h;
+            debugCtx.putImageData(imgData, 0, 0);
+          }
+          if(debugInfo){
+            debugInfo.textContent = `frames: ${frameCount} | video: ${video.videoWidth}x${video.videoHeight} | captured: ${w}x${h} | errors: ${errorCount} | last code found: ${code ? code.data : 'none'}`;
+          }
+        }
         if(code && code.data && Date.now() - lastHit > 1500){
           const it = findItem(code.data);
           if(it){
@@ -876,6 +896,7 @@ async function startScanUI(){
           }
         }
       }catch(err){
+        errorCount++;
         console.error('Scan frame error', err);
       }
       scanRAF = requestAnimationFrame(tick);
