@@ -10371,33 +10371,48 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     .label-grid{grid-template-columns:repeat(3,1fr);gap:8px;}
     .label-card{break-inside:avoid;border:1px dashed #999;}
   }
-  .single-print-label{display:none;}
-  body.printing-single #app{
-    display:none !important;
-  }
-  body.printing-single .single-print-label{
-    display:flex !important;align-items:center;justify-content:center;
+  .single-print-label{
+    display:none;align-items:center;justify-content:center;
     box-sizing:border-box;overflow:hidden;
   }
-  body.printing-single .single-print-label.layout-stack{
+  body.printing-single #app, body.printing-bulk #app{
+    display:none !important;
+  }
+  body.printing-single .single-print-label{ display:flex !important; }
+  body.printing-bulk .single-print-label.bulk-label{ display:flex !important; }
+
+  .single-print-label.layout-stack{
     flex-direction:column;text-align:center;padding:0.04in;gap:0.02in;
   }
-  body.printing-single .single-print-label.layout-row{
+  .single-print-label.layout-row{
     flex-direction:row;text-align:left;gap:0.08in;padding:0.05in;
   }
-  body.printing-single .single-print-label .qr-box{flex-shrink:0;line-height:0;}
-  body.printing-single .single-print-label .qr-box canvas,
-  body.printing-single .single-print-label .qr-box img{
+  .single-print-label .qr-box{flex-shrink:0;line-height:0;}
+  .single-print-label .qr-box canvas,
+  .single-print-label .qr-box img{
     width:100% !important;height:100% !important;display:block;
   }
-  body.printing-single .single-print-label .label-text{min-width:0;}
-  body.printing-single .single-print-label .tag-id{font-family:'IBM Plex Mono',monospace;font-weight:600;}
-  body.printing-single .single-print-label .tag-name{font-family:'Nunito',sans-serif;font-weight:800;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  body.printing-single .single-print-label .tag-cat{color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  body.printing-single .single-print-label.layout-stack .tag-id{font-size:10px;margin-top:0;line-height:1;}
-  body.printing-single .single-print-label.layout-row .tag-id{font-size:13px;}
-  body.printing-single .single-print-label.layout-row .tag-name{font-size:13.5px;margin-top:2px;}
-  body.printing-single .single-print-label.layout-row .tag-cat{font-size:11px;margin-top:1px;}
+  .single-print-label .label-text{min-width:0;}
+  .single-print-label .tag-id{font-family:'IBM Plex Mono',monospace;font-weight:600;}
+  .single-print-label .tag-name{font-family:'Nunito',sans-serif;font-weight:800;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .single-print-label .tag-cat{color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .single-print-label.layout-stack .tag-id{font-size:10px;margin-top:0;line-height:1;}
+  .single-print-label.layout-row .tag-id{font-size:13px;}
+  .single-print-label.layout-row .tag-name{font-size:13.5px;margin-top:2px;}
+  .single-print-label.layout-row .tag-cat{font-size:11px;margin-top:1px;}
+
+  .bulk-print-container{display:none;}
+  body.printing-bulk .bulk-print-container{
+    display:flex !important;flex-wrap:wrap;align-content:flex-start;gap:0.1in;
+  }
+  body.printing-bulk .single-print-label.bulk-label{
+    break-inside:avoid;page-break-inside:avoid;flex-shrink:0;
+  }
+
+  /* SELECT MODE (bulk actions in Inventory tab) */
+  .select-toolbar{display:flex;align-items:center;gap:8px;margin:12px 4px 10px;}
+  .select-count{flex:1;text-align:center;font-family:'Nunito',sans-serif;font-weight:800;color:var(--purple);font-size:13px;}
+  .item-checkbox{width:19px;height:19px;accent-color:var(--purple);flex-shrink:0;margin-right:2px;}
 
 
   /* LABEL SIZE PICKER */
@@ -10673,8 +10688,12 @@ function render(){
 
 /* ============ INVENTORY TAB ============ */
 let searchQuery = '';
+let selectMode = false;
+let selectedIds = new Set();
+
 function renderInventory(main){
   const byCat = {};
+  const visibleIds = [];
   STATE.items.forEach(it=>{
     const q = searchQuery.trim().toLowerCase();
     if(q){
@@ -10682,9 +10701,26 @@ function renderInventory(main){
       if(!hay.includes(q)) return;
     }
     (byCat[it.category] = byCat[it.category] || []).push(it);
+    visibleIds.push(it.id);
   });
 
+  const allVisibleSelected = visibleIds.length > 0 && visibleIds.every(id=>selectedIds.has(id));
+
   let html = `<input type="text" id="searchBox" placeholder="Search brand, model, or ID..." value="${escapeHtml(searchQuery)}">`;
+
+  html += `<div class="select-toolbar no-print">`;
+  if(!selectMode){
+    html += `<button class="btn ghost small" id="enterSelectMode" style="width:auto;">Select Items</button>`;
+  } else {
+    html += `<button class="btn ghost small" id="exitSelectMode" style="width:auto;">Cancel</button>
+      <div class="select-count">${selectedIds.size} selected</div>
+      <button class="btn small" id="toggleSelectAll" style="width:auto;">${allVisibleSelected ? 'Clear' : 'Select All'}</button>`;
+  }
+  html += `</div>`;
+
+  if(selectMode && selectedIds.size > 0){
+    html += `<button class="btn green no-print" id="printSelectedBtn" style="margin-bottom:14px;">Print ${selectedIds.size} Label${selectedIds.size>1?'s':''}</button>`;
+  }
 
   const cats = Object.keys(byCat);
   if(cats.length === 0){
@@ -10702,6 +10738,7 @@ function renderInventory(main){
         badge = `<span class="badge ${low?'low':'stock'}">${it.available}/${it.qty}</span>`;
       }
       html += `<div class="item-row" data-id="${it.id}">
+        ${selectMode ? `<input type="checkbox" class="item-checkbox" ${selectedIds.has(it.id)?'checked':''} tabindex="-1">` : ''}
         <div class="item-main">
           <div class="item-name">${escapeHtml(it.brand)} ${escapeHtml(it.model)}</div>
           <div class="item-sub item-id">${it.id}</div>
@@ -10715,8 +10752,33 @@ function renderInventory(main){
   main.innerHTML = html;
   const sb = document.getElementById('searchBox');
   sb.addEventListener('input', (e)=>{ searchQuery = e.target.value; renderInventory(main); sb.focus(); sb.setSelectionRange(sb.value.length, sb.value.length); });
+
   main.querySelectorAll('.item-row').forEach(row=>{
-    row.addEventListener('click', ()=>openDetail(row.dataset.id));
+    row.addEventListener('click', ()=>{
+      if(selectMode){
+        const id = row.dataset.id;
+        if(selectedIds.has(id)) selectedIds.delete(id); else selectedIds.add(id);
+        renderInventory(main);
+      } else {
+        openDetail(row.dataset.id);
+      }
+    });
+  });
+
+  const esm = document.getElementById('enterSelectMode');
+  if(esm) esm.addEventListener('click', ()=>{ selectMode = true; renderInventory(main); });
+  const xsm = document.getElementById('exitSelectMode');
+  if(xsm) xsm.addEventListener('click', ()=>{ selectMode = false; selectedIds.clear(); renderInventory(main); });
+  const tsa = document.getElementById('toggleSelectAll');
+  if(tsa) tsa.addEventListener('click', ()=>{
+    if(allVisibleSelected){ visibleIds.forEach(id=>selectedIds.delete(id)); }
+    else { visibleIds.forEach(id=>selectedIds.add(id)); }
+    renderInventory(main);
+  });
+  const psb = document.getElementById('printSelectedBtn');
+  if(psb) psb.addEventListener('click', ()=>{
+    const items = Array.from(selectedIds).map(id=>findItem(id)).filter(Boolean);
+    openBulkPrintPrompt(items);
   });
 }
 
@@ -10912,6 +10974,108 @@ function openPrintPrompt(it){
   document.getElementById('doPrintPrompt').addEventListener('click', ()=>{
     printSingleLabel(it, selected);
   });
+}
+
+function buildSizeOptionsHtml(defaultKey){
+  return Object.keys(LABEL_SIZES).map(key=>{
+    const s = LABEL_SIZES[key];
+    const swatchW = Math.round(s.widthIn * 16);
+    const swatchH = Math.round(s.heightIn * 16);
+    return `<label class="size-option ${key===defaultKey?'selected':''}" data-size="${key}">
+      <input type="radio" name="labelSizeChoice" value="${key}" ${key===defaultKey?'checked':''}>
+      <div class="size-card">
+        <div class="size-left">
+          <div class="size-swatch" style="width:${swatchW}px;height:${swatchH}px;"></div>
+          <div>
+            <div class="size-name">${s.name}</div>
+            <div class="size-hint">${s.hint}</div>
+          </div>
+        </div>
+        <div class="size-dim">${s.widthIn}"&times;${s.heightIn}"</div>
+      </div>
+    </label>`;
+  }).join('');
+}
+
+function wireSizeOptions(root){
+  let selected = 'medium';
+  const options = root.querySelectorAll('.size-option');
+  options.forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      selected = opt.dataset.size;
+      options.forEach(o=>o.classList.toggle('selected', o === opt));
+      opt.querySelector('input').checked = true;
+    });
+  });
+  return () => selected;
+}
+
+function openBulkPrintPrompt(items){
+  if(!items.length){ toast('No items selected'); return; }
+  const root = document.getElementById('overlayRoot');
+  root.innerHTML = `
+    <div class="overlay" id="bulkPrintOverlay">
+      <div class="sheet" style="position:relative;">
+        <button class="sheet-close" id="closeBulkPrint">&times;</button>
+        <div class="sheet-handle"></div>
+        <div class="section-title" style="margin-top:0;">Print ${items.length} Label${items.length>1?'s':''}</div>
+        <div style="text-align:center;margin:-4px 0 16px;color:var(--ink-soft);font-size:13px;">All selected items will print at the same size, laid out to cut apart.</div>
+        <div class="size-options" id="sizeOptions">
+          ${buildSizeOptionsHtml('medium')}
+        </div>
+        <button class="btn green" id="doBulkPrint">Print ${items.length} Label${items.length>1?'s':''}</button>
+        <button class="btn ghost" id="cancelBulkPrint" style="margin-top:10px;">Cancel</button>
+      </div>
+    </div>`;
+
+  const overlay = document.getElementById('bulkPrintOverlay');
+  overlay.addEventListener('click', (e)=>{ if(e.target.id === 'bulkPrintOverlay') closeDetail(); });
+  document.getElementById('closeBulkPrint').addEventListener('click', closeDetail);
+  document.getElementById('cancelBulkPrint').addEventListener('click', closeDetail);
+
+  const getSelected = wireSizeOptions(root);
+
+  document.getElementById('doBulkPrint').addEventListener('click', ()=>{
+    printBulkLabels(items, getSelected());
+    closeDetail();
+    selectMode = false;
+    selectedIds.clear();
+    render();
+  });
+}
+
+function printBulkLabels(items, sizeKey){
+  const size = LABEL_SIZES[sizeKey] || LABEL_SIZES.medium;
+  let el = document.getElementById('bulkPrintContainer');
+  if(el) el.remove();
+  el = document.createElement('div');
+  el.id = 'bulkPrintContainer';
+  el.className = 'bulk-print-container';
+  el.innerHTML = items.map(it => `
+    <div class="single-print-label layout-${size.layout} bulk-label" style="width:${size.widthIn}in;height:${size.heightIn}in;">
+      <div class="qr-box" id="bulkQr-${it.id}" style="width:${size.qrIn}in;height:${size.qrIn}in;"></div>
+      <div class="label-text">
+        <div class="tag-id">${it.id}</div>
+        ${size.showBrandModel ? `<div class="tag-name">${escapeHtml(it.brand)} ${escapeHtml(it.model)}</div>` : ''}
+        ${size.showCategory ? `<div class="tag-cat">${escapeHtml(it.category)}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+  document.body.appendChild(el);
+  items.forEach(it=>{
+    const qrEl = document.getElementById('bulkQr-'+it.id);
+    if(qrEl) renderQR(qrEl, it.id, Math.round(size.qrIn * 300));
+  });
+
+  document.body.classList.add('printing-bulk');
+  const cleanup = () => {
+    document.body.classList.remove('printing-bulk');
+    const stray = document.getElementById('bulkPrintContainer');
+    if(stray) stray.remove();
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.addEventListener('afterprint', cleanup);
+  setTimeout(()=>window.print(), 50);
 }
 
 /* ============ CHECKOUT FORM ============ */
