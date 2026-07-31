@@ -10380,10 +10380,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     box-sizing:border-box;overflow:hidden;
   }
   body.printing-single .single-print-label.layout-stack{
-    flex-direction:column;text-align:center;padding:0.08in;
+    flex-direction:column;text-align:center;padding:0.04in;gap:0.02in;
   }
   body.printing-single .single-print-label.layout-row{
-    flex-direction:row;text-align:left;gap:0.1in;padding:0.08in;
+    flex-direction:row;text-align:left;gap:0.08in;padding:0.05in;
   }
   body.printing-single .single-print-label .qr-box{flex-shrink:0;line-height:0;}
   body.printing-single .single-print-label .qr-box canvas,
@@ -10394,7 +10394,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   body.printing-single .single-print-label .tag-id{font-family:'IBM Plex Mono',monospace;font-weight:600;}
   body.printing-single .single-print-label .tag-name{font-family:'Nunito',sans-serif;font-weight:800;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   body.printing-single .single-print-label .tag-cat{color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  body.printing-single .single-print-label.layout-stack .tag-id{font-size:15px;margin-top:0.08in;}
+  body.printing-single .single-print-label.layout-stack .tag-id{font-size:10px;margin-top:0;line-height:1;}
   body.printing-single .single-print-label.layout-row .tag-id{font-size:13px;}
   body.printing-single .single-print-label.layout-row .tag-name{font-size:13.5px;margin-top:2px;}
   body.printing-single .single-print-label.layout-row .tag-cat{font-size:11px;margin-top:1px;}
@@ -10817,7 +10817,7 @@ function renderQR(container, text, size){
 }
 
 const LABEL_SIZES = {
-  small:  {name:'Small',  hint:'USB drives, small parts', widthIn: 1,   heightIn: 1,   qrIn: 0.82, layout:'stack', showBrandModel: false, showCategory: false},
+  small:  {name:'Small',  hint:'USB drives, small parts', widthIn: 1,   heightIn: 1,   qrIn: 0.62, layout:'stack', showBrandModel: false, showCategory: false},
   medium: {name:'Medium', hint:'Hard drives, adapters',   widthIn: 2,   heightIn: 1,   qrIn: 0.82, layout:'row',   showBrandModel: true,  showCategory: false},
   large:  {name:'Large',  hint:'Laptops, larger gear',    widthIn: 3,   heightIn: 1.5, qrIn: 1.28, layout:'row',   showBrandModel: true,  showCategory: true}
 };
