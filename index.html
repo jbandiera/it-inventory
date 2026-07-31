@@ -10376,12 +10376,47 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     display:none !important;
   }
   body.printing-single .single-print-label{
-    display:flex !important;flex-direction:column;align-items:center;justify-content:center;
-    padding:60px;text-align:center;
+    display:flex !important;align-items:center;justify-content:center;
+    box-sizing:border-box;overflow:hidden;
   }
-  body.printing-single .single-print-label .tag-id{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:18px;margin-top:14px;}
-  body.printing-single .single-print-label .tag-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:22px;margin-top:6px;color:var(--ink);}
-  body.printing-single .single-print-label .tag-cat{font-size:14px;color:var(--ink-soft);margin-top:4px;}
+  body.printing-single .single-print-label.layout-stack{
+    flex-direction:column;text-align:center;padding:0.08in;
+  }
+  body.printing-single .single-print-label.layout-row{
+    flex-direction:row;text-align:left;gap:0.1in;padding:0.08in;
+  }
+  body.printing-single .single-print-label .qr-box{flex-shrink:0;line-height:0;}
+  body.printing-single .single-print-label .qr-box canvas,
+  body.printing-single .single-print-label .qr-box img{
+    width:100% !important;height:100% !important;display:block;
+  }
+  body.printing-single .single-print-label .label-text{min-width:0;}
+  body.printing-single .single-print-label .tag-id{font-family:'IBM Plex Mono',monospace;font-weight:600;}
+  body.printing-single .single-print-label .tag-name{font-family:'Nunito',sans-serif;font-weight:800;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  body.printing-single .single-print-label .tag-cat{color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  body.printing-single .single-print-label.layout-stack .tag-id{font-size:15px;margin-top:0.08in;}
+  body.printing-single .single-print-label.layout-row .tag-id{font-size:13px;}
+  body.printing-single .single-print-label.layout-row .tag-name{font-size:13.5px;margin-top:2px;}
+  body.printing-single .single-print-label.layout-row .tag-cat{font-size:11px;margin-top:1px;}
+
+
+  /* LABEL SIZE PICKER */
+  .size-options{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
+  .size-option{display:block;cursor:pointer;}
+  .size-option input{position:absolute;opacity:0;pointer-events:none;}
+  .size-card{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 16px;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .size-option.selected .size-card{border-color:var(--purple);background:var(--pink-bg);}
+  .size-card .size-left{display:flex;align-items:center;gap:12px;}
+  .size-card .size-swatch{
+    background:var(--purple);border-radius:5px;flex-shrink:0;
+  }
+  .size-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:14.5px;color:var(--ink);}
+  .size-hint{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
+  .size-dim{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -10752,7 +10787,7 @@ function openDetail(id){
     if(e.target.id === 'detailOverlay') closeDetail();
   });
   document.getElementById('closeDetail').addEventListener('click', closeDetail);
-  document.getElementById('printSingleLabel').addEventListener('click', ()=>printSingleLabel(it));
+  document.getElementById('printSingleLabel').addEventListener('click', ()=>openPrintPrompt(it));
 
   const co = document.getElementById('doCheckout');
   if(co) co.addEventListener('click', ()=>openCheckoutForm(it, 'unit'));
@@ -10781,20 +10816,34 @@ function renderQR(container, text, size){
   });
 }
 
-function printSingleLabel(it){
+const LABEL_SIZES = {
+  small:  {name:'Small',  hint:'USB drives, small parts', widthIn: 1,   heightIn: 1,   qrIn: 0.82, layout:'stack', showBrandModel: false, showCategory: false},
+  medium: {name:'Medium', hint:'Hard drives, adapters',   widthIn: 2,   heightIn: 1,   qrIn: 0.82, layout:'row',   showBrandModel: true,  showCategory: false},
+  large:  {name:'Large',  hint:'Laptops, larger gear',    widthIn: 3,   heightIn: 1.5, qrIn: 1.28, layout:'row',   showBrandModel: true,  showCategory: true}
+};
+
+function printSingleLabel(it, sizeKey){
+  const size = LABEL_SIZES[sizeKey] || LABEL_SIZES.medium;
   let el = document.getElementById('singlePrintLabel');
   if(el) el.remove();
   el = document.createElement('div');
   el.id = 'singlePrintLabel';
-  el.className = 'single-print-label';
+  el.className = 'single-print-label layout-' + size.layout;
+  el.style.width = size.widthIn + 'in';
+  el.style.height = size.heightIn + 'in';
   el.innerHTML = `
-    <div class="qr-box" id="singlePrintQr"></div>
-    <div class="tag-id">${it.id}</div>
-    <div class="tag-name">${escapeHtml(it.brand)} ${escapeHtml(it.model)}</div>
-    <div class="tag-cat">${escapeHtml(it.category)}</div>
+    <div class="qr-box" id="singlePrintQr" style="width:${size.qrIn}in;height:${size.qrIn}in;"></div>
+    <div class="label-text">
+      <div class="tag-id">${it.id}</div>
+      ${size.showBrandModel ? `<div class="tag-name">${escapeHtml(it.brand)} ${escapeHtml(it.model)}</div>` : ''}
+      ${size.showCategory ? `<div class="tag-cat">${escapeHtml(it.category)}</div>` : ''}
+    </div>
   `;
   document.body.appendChild(el);
-  renderQR(document.getElementById('singlePrintQr'), it.id, 220);
+  // Render QR at a fixed raster resolution (300dpi for the physical qrIn size);
+  // the CSS above then locks its on-page/on-print size to exactly qrIn inches,
+  // regardless of that native pixel size, so it can never overflow the label.
+  renderQR(document.getElementById('singlePrintQr'), it.id, Math.round(size.qrIn * 300));
 
   document.body.classList.add('printing-single');
   const cleanup = () => {
@@ -10805,6 +10854,60 @@ function printSingleLabel(it){
   };
   window.addEventListener('afterprint', cleanup);
   setTimeout(()=>window.print(), 50);
+}
+
+function openPrintPrompt(it){
+  const root = document.getElementById('overlayRoot');
+  let selected = 'medium';
+  root.innerHTML = `
+    <div class="overlay" id="printPromptOverlay">
+      <div class="sheet" style="position:relative;">
+        <button class="sheet-close" id="closePrintPrompt">&times;</button>
+        <div class="sheet-handle"></div>
+        <div class="section-title" style="margin-top:0;">Print a Label?</div>
+        <div style="text-align:center;margin:-4px 0 16px;color:var(--ink-soft);font-size:13px;">${escapeHtml(it.brand)} ${escapeHtml(it.model)} was added as <b style="color:var(--purple);">${it.id}</b></div>
+        <div class="size-options" id="sizeOptions">
+          ${Object.keys(LABEL_SIZES).map(key=>{
+            const s = LABEL_SIZES[key];
+            const swatchW = Math.round(s.widthIn * 16);
+            const swatchH = Math.round(s.heightIn * 16);
+            return `<label class="size-option ${key==='medium'?'selected':''}" data-size="${key}">
+              <input type="radio" name="labelSizeChoice" value="${key}" ${key==='medium'?'checked':''}>
+              <div class="size-card">
+                <div class="size-left">
+                  <div class="size-swatch" style="width:${swatchW}px;height:${swatchH}px;"></div>
+                  <div>
+                    <div class="size-name">${s.name}</div>
+                    <div class="size-hint">${s.hint}</div>
+                  </div>
+                </div>
+                <div class="size-dim">${s.widthIn}"&times;${s.heightIn}"</div>
+              </div>
+            </label>`;
+          }).join('')}
+        </div>
+        <button class="btn green" id="doPrintPrompt">Print Label</button>
+        <button class="btn ghost" id="skipPrintPrompt" style="margin-top:10px;">Skip for Now</button>
+      </div>
+    </div>`;
+
+  const overlay = document.getElementById('printPromptOverlay');
+  overlay.addEventListener('click', (e)=>{ if(e.target.id === 'printPromptOverlay') closeDetail(); });
+  document.getElementById('closePrintPrompt').addEventListener('click', closeDetail);
+  document.getElementById('skipPrintPrompt').addEventListener('click', closeDetail);
+
+  const options = root.querySelectorAll('.size-option');
+  options.forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      selected = opt.dataset.size;
+      options.forEach(o=>o.classList.toggle('selected', o === opt));
+      opt.querySelector('input').checked = true;
+    });
+  });
+
+  document.getElementById('doPrintPrompt').addEventListener('click', ()=>{
+    printSingleLabel(it, selected);
+  });
 }
 
 /* ============ CHECKOUT FORM ============ */
@@ -10955,7 +11058,7 @@ function openAddItemForm(){
     closeDetail();
     render();
     toast(`Added ${id}`);
-    openDetail(id);
+    openPrintPrompt(newItem);
   });
 }
 
