@@ -10692,6 +10692,25 @@ let selectMode = false;
 let selectedIds = new Set();
 
 function renderInventory(main){
+  // The search <input> is only created once per tab-visit; every keystroke
+  // after that only rebuilds the results below it, so the input never gets
+  // destroyed/recreated mid-typing (which was breaking focus after 1 char).
+  if(!document.getElementById('searchBox')){
+    main.innerHTML = `
+      <input type="text" id="searchBox" placeholder="Search brand, model, or ID..." value="${escapeHtml(searchQuery)}">
+      <div id="invToolbarWrap"></div>
+      <div id="invResultsWrap"></div>
+    `;
+    const sb = document.getElementById('searchBox');
+    sb.addEventListener('input', (e)=>{
+      searchQuery = e.target.value;
+      renderInventoryBody();
+    });
+  }
+  renderInventoryBody();
+}
+
+function renderInventoryBody(){
   const byCat = {};
   const visibleIds = [];
   STATE.items.forEach(it=>{
@@ -10706,29 +10725,28 @@ function renderInventory(main){
 
   const allVisibleSelected = visibleIds.length > 0 && visibleIds.every(id=>selectedIds.has(id));
 
-  let html = `<input type="text" id="searchBox" placeholder="Search brand, model, or ID..." value="${escapeHtml(searchQuery)}">`;
-
-  html += `<div class="select-toolbar no-print">`;
+  let toolbarHtml = `<div class="select-toolbar no-print">`;
   if(!selectMode){
-    html += `<button class="btn ghost small" id="enterSelectMode" style="width:auto;">Select Items</button>`;
+    toolbarHtml += `<button class="btn ghost small" id="enterSelectMode" style="width:auto;">Select Items</button>`;
   } else {
-    html += `<button class="btn ghost small" id="exitSelectMode" style="width:auto;">Cancel</button>
+    toolbarHtml += `<button class="btn ghost small" id="exitSelectMode" style="width:auto;">Cancel</button>
       <div class="select-count">${selectedIds.size} selected</div>
       <button class="btn small" id="toggleSelectAll" style="width:auto;">${allVisibleSelected ? 'Clear' : 'Select All'}</button>`;
   }
-  html += `</div>`;
+  toolbarHtml += `</div>`;
 
   if(selectMode && selectedIds.size > 0){
-    html += `<button class="btn green no-print" id="printSelectedBtn" style="margin-bottom:14px;">Print ${selectedIds.size} Label${selectedIds.size>1?'s':''}</button>`;
+    toolbarHtml += `<button class="btn green no-print" id="printSelectedBtn" style="margin-bottom:14px;">Print ${selectedIds.size} Label${selectedIds.size>1?'s':''}</button>`;
   }
 
+  let resultsHtml = '';
   const cats = Object.keys(byCat);
   if(cats.length === 0){
-    html += `<div class="empty-state"><div class="big">No matches</div>Try a different search term.</div>`;
+    resultsHtml = `<div class="empty-state"><div class="big">No matches</div>Try a different search term.</div>`;
   }
   cats.forEach(cat=>{
     const items = byCat[cat];
-    html += `<details class="cat" open><summary><span>${escapeHtml(cat)}</span><span style="display:flex;align-items:center;gap:8px;"><span class="count">${items.length} SKU</span><span class="chev">&#9656;</span></span></summary>`;
+    resultsHtml += `<details class="cat" open><summary><span>${escapeHtml(cat)}</span><span style="display:flex;align-items:center;gap:8px;"><span class="count">${items.length} SKU</span><span class="chev">&#9656;</span></span></summary>`;
     items.forEach(it=>{
       let badge = '';
       if(it.type==='unit'){
@@ -10737,7 +10755,7 @@ function renderInventory(main){
         const low = it.available <= Math.ceil(it.qty*0.2) && it.available < it.qty;
         badge = `<span class="badge ${low?'low':'stock'}">${it.available}/${it.qty}</span>`;
       }
-      html += `<div class="item-row" data-id="${it.id}">
+      resultsHtml += `<div class="item-row" data-id="${it.id}">
         ${selectMode ? `<input type="checkbox" class="item-checkbox" ${selectedIds.has(it.id)?'checked':''} tabindex="-1">` : ''}
         <div class="item-main">
           <div class="item-name">${escapeHtml(it.brand)} ${escapeHtml(it.model)}</div>
@@ -10746,19 +10764,21 @@ function renderInventory(main){
         ${badge}
       </div>`;
     });
-    html += `</details>`;
+    resultsHtml += `</details>`;
   });
 
-  main.innerHTML = html;
-  const sb = document.getElementById('searchBox');
-  sb.addEventListener('input', (e)=>{ searchQuery = e.target.value; renderInventory(main); sb.focus(); sb.setSelectionRange(sb.value.length, sb.value.length); });
+  const toolbarWrap = document.getElementById('invToolbarWrap');
+  const resultsWrap = document.getElementById('invResultsWrap');
+  if(!toolbarWrap || !resultsWrap) return; // tab changed before this ran
+  toolbarWrap.innerHTML = toolbarHtml;
+  resultsWrap.innerHTML = resultsHtml;
 
-  main.querySelectorAll('.item-row').forEach(row=>{
+  resultsWrap.querySelectorAll('.item-row').forEach(row=>{
     row.addEventListener('click', ()=>{
       if(selectMode){
         const id = row.dataset.id;
         if(selectedIds.has(id)) selectedIds.delete(id); else selectedIds.add(id);
-        renderInventory(main);
+        renderInventoryBody();
       } else {
         openDetail(row.dataset.id);
       }
@@ -10766,14 +10786,14 @@ function renderInventory(main){
   });
 
   const esm = document.getElementById('enterSelectMode');
-  if(esm) esm.addEventListener('click', ()=>{ selectMode = true; renderInventory(main); });
+  if(esm) esm.addEventListener('click', ()=>{ selectMode = true; renderInventoryBody(); });
   const xsm = document.getElementById('exitSelectMode');
-  if(xsm) xsm.addEventListener('click', ()=>{ selectMode = false; selectedIds.clear(); renderInventory(main); });
+  if(xsm) xsm.addEventListener('click', ()=>{ selectMode = false; selectedIds.clear(); renderInventoryBody(); });
   const tsa = document.getElementById('toggleSelectAll');
   if(tsa) tsa.addEventListener('click', ()=>{
     if(allVisibleSelected){ visibleIds.forEach(id=>selectedIds.delete(id)); }
     else { visibleIds.forEach(id=>selectedIds.add(id)); }
-    renderInventory(main);
+    renderInventoryBody();
   });
   const psb = document.getElementById('printSelectedBtn');
   if(psb) psb.addEventListener('click', ()=>{
