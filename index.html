@@ -10778,6 +10778,9 @@ function openDetail(id){
         </div>
         <button class="btn ghost no-print" id="printSingleLabel" style="margin-bottom:14px;">Print This Label</button>
         ${statusBlock}
+        <div style="margin-top:18px;border-top:1px dashed var(--line);padding-top:14px;">
+          <a class="reset-link" id="removeItemLink" style="color:var(--rust);">Remove from Inventory</a>
+        </div>
       </div>
     </div>`;
 
@@ -10788,6 +10791,7 @@ function openDetail(id){
   });
   document.getElementById('closeDetail').addEventListener('click', closeDetail);
   document.getElementById('printSingleLabel').addEventListener('click', ()=>openPrintPrompt(it));
+  document.getElementById('removeItemLink').addEventListener('click', ()=>confirmRemoveItem(it));
 
   const co = document.getElementById('doCheckout');
   if(co) co.addEventListener('click', ()=>openCheckoutForm(it, 'unit'));
@@ -11201,8 +11205,10 @@ function renderActivity(main){
   } else {
     let html = '';
     STATE.log.forEach(l=>{
-      const actionLabel = l.action === 'check_out' ? 'Checked Out' : 'Checked In';
-      const color = l.action === 'check_out' ? 'var(--rust)' : 'var(--green)';
+      let actionLabel, color;
+      if(l.action === 'check_out'){ actionLabel = 'Checked Out'; color = 'var(--rust)'; }
+      else if(l.action === 'removed'){ actionLabel = 'Removed'; color = 'var(--ink-soft)'; }
+      else { actionLabel = 'Checked In'; color = 'var(--green)'; }
       html += `<div class="log-row">
         <div class="log-left">
           <div class="log-item">${escapeHtml(l.itemName)} <span style="color:var(--ink-soft);font-weight:400;font-family:'IBM Plex Mono',monospace;font-size:11px;">${l.itemId}</span></div>
@@ -11228,6 +11234,31 @@ async function resetInventory(){
   await persist();
   render();
   toast('Inventory reset');
+}
+
+/* ============ REMOVE ITEM ============ */
+function confirmRemoveItem(it){
+  let warning = '';
+  if(it.type === 'unit' && it.status === 'out'){
+    warning = ` Note: this is currently checked out to ${it.holder || 'someone'} — removing it will drop that record.`;
+  } else if(it.type === 'stock' && (it.checkouts||[]).length){
+    const outQty = it.checkouts.reduce((a,c)=>a+c.qty,0);
+    warning = ` Note: ${outQty} unit(s) are currently checked out — removing it will drop those records.`;
+  }
+  const ok = confirm(`Remove ${it.id} — ${it.brand} ${it.model} — from your inventory permanently?${warning}`);
+  if(!ok) return;
+  removeItem(it);
+}
+
+async function removeItem(it){
+  const idx = STATE.items.findIndex(i => i.id === it.id);
+  if(idx === -1) return;
+  STATE.items.splice(idx, 1);
+  STATE.log.unshift({ts:Date.now(), tsStr:nowStr(), itemId:it.id, itemName:it.brand+' '+it.model, action:'removed', qty:it.qty, holder:'', purpose:''});
+  await persist();
+  closeDetail();
+  render();
+  toast(`${it.id} removed from inventory`);
 }
 
 /* ============ INIT ============ */
