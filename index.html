@@ -10559,6 +10559,9 @@ async function loadLocalState(){
   await persist();
 }
 
+let lastLocalWriteAt = 0;
+const SYNC_ECHO_COOLDOWN_MS = 3000;
+
 async function loadState(){
   if(hasFirebaseConfig && !hasClaudeStorage){
     const ok = await initFirebase();
@@ -10568,6 +10571,14 @@ async function loadState(){
       await new Promise((resolve)=>{
         let firstLoad = true;
         firestoreDocRef.onSnapshot((doc)=>{
+          // Ignore updates that arrive shortly after our own write — these are
+          // almost always just an echo of what we ourselves just saved, and
+          // applying them (especially if delayed/out-of-order) can otherwise
+          // clobber a change made in the few seconds right after, forcing you
+          // to redo the same action multiple times before it "sticks."
+          if(!firstLoad && Date.now() - lastLocalWriteAt < SYNC_ECHO_COOLDOWN_MS){
+            return;
+          }
           if(doc.exists){
             STATE = doc.data();
           } else if(firstLoad){
@@ -10594,12 +10605,14 @@ async function loadState(){
 }
 
 async function persist(){
+  lastLocalWriteAt = Date.now();
   if(hasFirebaseConfig && firestoreDocRef){
     try{ await firestoreDocRef.set(STATE); }
     catch(e){ console.error('Firestore write failed, saving locally instead', e); await storageSet('inventory-state', JSON.stringify(STATE)); }
   } else {
     await storageSet('inventory-state', JSON.stringify(STATE));
   }
+  lastLocalWriteAt = Date.now(); // extend cooldown past the round trip in case the echo lands late
   pushToSheet();
 }
 
@@ -10890,12 +10903,12 @@ function openDetail(id){
   const co = document.getElementById('doCheckout');
   if(co) co.addEventListener('click', ()=>openCheckoutForm(it, 'unit'));
   const ci = document.getElementById('doCheckin');
-  if(ci) ci.addEventListener('click', ()=>{ checkInUnit(it); closeDetail(); });
+  if(ci) ci.addEventListener('click', async ()=>{ await checkInUnit(it); closeDetail(); });
   const so = document.getElementById('doStockOut');
   if(so) so.addEventListener('click', ()=>openCheckoutForm(it, 'stock'));
   root.querySelectorAll('[data-return]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      returnStock(it, btn.dataset.return);
+    btn.addEventListener('click', async ()=>{
+      await returnStock(it, btn.dataset.return);
       openDetail(it.id);
     });
   });
@@ -11149,11 +11162,11 @@ function openCheckoutForm(it, mode){
       if(e.target.id === 'formOverlay') closeDetail();
     });
     document.getElementById('closeForm').addEventListener('click', ()=>openDetail(it.id));
-    document.getElementById('foSubmit').addEventListener('click', ()=>{
+    document.getElementById('foSubmit').addEventListener('click', async ()=>{
       const holder = document.getElementById('foHolder').value.trim();
       const purpose = document.getElementById('foPurpose').value.trim();
       if(!holder){ toast('Enter who is holding this item'); return; }
-      checkOutUnit(it, holder, purpose);
+      await checkOutUnit(it, holder, purpose);
       openDetail(it.id);
     });
     return;
@@ -11237,14 +11250,15 @@ function openCheckoutForm(it, mode){
     recipients.push({qty: 1, holder:'', purpose:''});
     renderRows();
   });
-  document.getElementById('foSubmit').addEventListener('click', ()=>{
+  document.getElementById('foSubmit').addEventListener('click', async ()=>{
     const total = currentTotal();
     if(total < 1){ toast('Enter at least one quantity'); return; }
-    if(total > it.available){ toast(`Only ${it.available} available — you're trying to check out ${total}`); return; }
+    const live = resolveLive(it) || it;
+    if(total > live.available){ toast(`Only ${live.available} available right now — you're trying to check out ${total}`); return; }
     for(const r of recipients){
       if(!r.holder || !r.holder.trim()){ toast('Enter who each recipient is'); return; }
     }
-    checkOutStockMultiple(it, recipients);
+    await checkOutStockMultiple(it, recipients);
     openDetail(it.id);
   });
 }
