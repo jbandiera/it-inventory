@@ -11114,44 +11114,125 @@ function printBulkLabels(items, sizeKey){
 /* ============ CHECKOUT FORM ============ */
 function openCheckoutForm(it, mode){
   const root = document.getElementById('overlayRoot');
-  const qtyField = mode === 'stock' ? `
-    <div class="field">
-      <label>Quantity (max ${it.available})</label>
-      <input type="number" id="foQty" min="1" max="${it.available}" value="1">
-    </div>` : '';
+
+  if(mode === 'unit'){
+    root.innerHTML = `
+      <div class="overlay" id="formOverlay">
+        <div class="sheet" style="position:relative;">
+          <button class="sheet-close" id="closeForm">&times;</button>
+          <div class="sheet-handle"></div>
+          <div class="section-title" style="margin-top:0;">Check Out &mdash; ${it.id}</div>
+          <div class="field">
+            <label>Held by</label>
+            <input type="text" id="foHolder" placeholder="Name">
+          </div>
+          <div class="field">
+            <label>Purpose / destination</label>
+            <input type="text" id="foPurpose" placeholder="e.g. Stream setup, Room 4">
+          </div>
+          <button class="btn green" id="foSubmit">Confirm Check Out</button>
+        </div>
+      </div>`;
+    document.getElementById('formOverlay').addEventListener('click', (e)=>{
+      if(e.target.id === 'formOverlay') closeDetail();
+    });
+    document.getElementById('closeForm').addEventListener('click', ()=>openDetail(it.id));
+    document.getElementById('foSubmit').addEventListener('click', ()=>{
+      const holder = document.getElementById('foHolder').value.trim();
+      const purpose = document.getElementById('foPurpose').value.trim();
+      if(!holder){ toast('Enter who is holding this item'); return; }
+      checkOutUnit(it, holder, purpose);
+      openDetail(it.id);
+    });
+    return;
+  }
+
+  // STOCK: support checking out to multiple recipients in one go
+  let recipients = [{qty:1, holder:'', purpose:''}];
+
+  function currentTotal(){
+    return recipients.reduce((a,r)=>a+(parseInt(r.qty,10)||0),0);
+  }
+
+  function updateRemainingIndicator(){
+    const remaining = it.available - currentTotal();
+    const ind = document.getElementById('remainingIndicator');
+    if(!ind) return;
+    ind.textContent = `${remaining} of ${it.available} remaining to allocate`;
+    ind.style.color = remaining < 0 ? 'var(--rust)' : 'var(--ink-soft)';
+  }
+
+  function renderRows(){
+    const wrap = document.getElementById('recipientRows');
+    wrap.innerHTML = recipients.map((r, idx) => `
+      <div class="checkout-row" style="flex-direction:column;align-items:stretch;gap:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-weight:800;font-size:12.5px;color:var(--purple);">Recipient ${idx+1}</div>
+          ${recipients.length>1 ? `<button class="btn small rust" data-remove="${idx}" type="button">Remove</button>` : ''}
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Quantity</label>
+          <input type="number" min="1" data-field="qty" data-idx="${idx}" value="${r.qty}">
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Held by</label>
+          <input type="text" data-field="holder" data-idx="${idx}" value="${escapeHtml(r.holder)}" placeholder="Name">
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Purpose / destination</label>
+          <input type="text" data-field="purpose" data-idx="${idx}" value="${escapeHtml(r.purpose)}" placeholder="e.g. Stream setup, Room 4">
+        </div>
+      </div>
+    `).join('');
+
+    wrap.querySelectorAll('input').forEach(inp=>{
+      inp.addEventListener('input', (e)=>{
+        const idx = parseInt(e.target.dataset.idx, 10);
+        recipients[idx][e.target.dataset.field] = e.target.value;
+        if(e.target.dataset.field === 'qty') updateRemainingIndicator();
+      });
+    });
+    wrap.querySelectorAll('[data-remove]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        recipients.splice(parseInt(btn.dataset.remove, 10), 1);
+        renderRows();
+        updateRemainingIndicator();
+      });
+    });
+    updateRemainingIndicator();
+  }
+
   root.innerHTML = `
     <div class="overlay" id="formOverlay">
       <div class="sheet" style="position:relative;">
         <button class="sheet-close" id="closeForm">&times;</button>
         <div class="sheet-handle"></div>
         <div class="section-title" style="margin-top:0;">Check Out &mdash; ${it.id}</div>
-        ${qtyField}
-        <div class="field">
-          <label>Held by</label>
-          <input type="text" id="foHolder" placeholder="Name">
-        </div>
-        <div class="field">
-          <label>Purpose / destination</label>
-          <input type="text" id="foPurpose" placeholder="e.g. Stream setup, Room 4">
-        </div>
+        <div id="remainingIndicator" style="text-align:center;font-size:12.5px;font-weight:700;margin-bottom:14px;"></div>
+        <div id="recipientRows"></div>
+        <button class="btn ghost" id="addRecipientBtn" type="button" style="margin-bottom:14px;">+ Add Another Recipient</button>
         <button class="btn green" id="foSubmit">Confirm Check Out</button>
       </div>
     </div>`;
+
+  renderRows();
+
   document.getElementById('formOverlay').addEventListener('click', (e)=>{
     if(e.target.id === 'formOverlay') closeDetail();
   });
   document.getElementById('closeForm').addEventListener('click', ()=>openDetail(it.id));
+  document.getElementById('addRecipientBtn').addEventListener('click', ()=>{
+    recipients.push({qty: 1, holder:'', purpose:''});
+    renderRows();
+  });
   document.getElementById('foSubmit').addEventListener('click', ()=>{
-    const holder = document.getElementById('foHolder').value.trim();
-    const purpose = document.getElementById('foPurpose').value.trim();
-    if(!holder){ toast('Enter who is holding this item'); return; }
-    if(mode === 'unit'){
-      checkOutUnit(it, holder, purpose);
-    } else {
-      const qty = parseInt(document.getElementById('foQty').value, 10) || 1;
-      if(qty < 1 || qty > it.available){ toast('Invalid quantity'); return; }
-      checkOutStock(it, qty, holder, purpose);
+    const total = currentTotal();
+    if(total < 1){ toast('Enter at least one quantity'); return; }
+    if(total > it.available){ toast(`Only ${it.available} available — you're trying to check out ${total}`); return; }
+    for(const r of recipients){
+      if(!r.holder || !r.holder.trim()){ toast('Enter who each recipient is'); return; }
     }
+    checkOutStockMultiple(it, recipients);
     openDetail(it.id);
   });
 }
@@ -11176,6 +11257,20 @@ async function checkOutStock(it, qty, holder, purpose){
   STATE.log.unshift({ts:Date.now(), tsStr:nowStr(), itemId:it.id, itemName:it.brand+' '+it.model, action:'check_out', qty, holder, purpose});
   await persist(); render();
   toast(`${qty} × ${it.id} checked out to ${holder}`);
+}
+async function checkOutStockMultiple(it, recipients){
+  it.checkouts = it.checkouts || [];
+  recipients.forEach(r=>{
+    const qty = parseInt(r.qty, 10) || 1;
+    const holder = r.holder.trim();
+    const purpose = (r.purpose || '').trim();
+    it.available -= qty;
+    it.checkouts.push({id:uid(), qty, holder, purpose, since:nowStr()});
+    STATE.log.unshift({ts:Date.now(), tsStr:nowStr(), itemId:it.id, itemName:it.brand+' '+it.model, action:'check_out', qty, holder, purpose});
+  });
+  await persist(); render();
+  const names = recipients.map(r=>r.holder.trim()).join(', ');
+  toast(`${it.id} checked out to ${names}`);
 }
 async function returnStock(it, checkoutId){
   const idx = (it.checkouts||[]).findIndex(c=>c.id===checkoutId);
@@ -11397,8 +11492,7 @@ function renderPrint(main){
 /* ============ ACTIVITY TAB ============ */
 function renderActivity(main){
   if(STATE.log.length === 0){
-    main.innerHTML = `<div class="empty-state"><div class="big">No activity yet</div>Check an item in or out to see it logged here.</div>
-      <div class="no-print" style="text-align:center;margin-top:20px;"><a class="reset-link" id="resetLink">Reset to original inventory</a></div>`;
+    main.innerHTML = `<div class="empty-state"><div class="big">No activity yet</div>Check an item in or out to see it logged here.</div>`;
   } else {
     let html = '';
     STATE.log.forEach(l=>{
@@ -11417,20 +11511,8 @@ function renderActivity(main){
         </div>
       </div>`;
     });
-    html += `<div class="no-print" style="text-align:center;margin-top:16px;"><a class="reset-link" id="resetLink">Reset to original inventory</a></div>`;
     main.innerHTML = html;
   }
-  const rl = document.getElementById('resetLink');
-  if(rl) rl.addEventListener('click', resetInventory);
-}
-
-async function resetInventory(){
-  if(!confirm('This clears all check-out history and restores original quantities. Continue?')) return;
-  const items = SEED_ITEMS.map(it => Object.assign({}, it, defaultRuntime(it)));
-  STATE = {items, log:[]};
-  await persist();
-  render();
-  toast('Inventory reset');
 }
 
 /* ============ REMOVE ITEM ============ */
