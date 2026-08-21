@@ -10630,6 +10630,18 @@ function findItem(id){
   return STATE.items.find(i => i.id.toLowerCase() === String(id).toLowerCase());
 }
 
+// Data can sync in from another device (or an echo of our own last save)
+// at any moment, which fully replaces STATE.items with a fresh array.
+// Any UI that's been sitting open (a checkout form, detail sheet) may still
+// be holding a reference to an item object from BEFORE that replacement —
+// mutating that stale object would silently do nothing, since it's no
+// longer part of the live STATE. Every mutating action re-resolves its
+// item by ID against the current live STATE right before touching it.
+function resolveLive(it){
+  if(!it || !it.id) return null;
+  return findItem(it.id) || null;
+}
+
 function uid(){ return Math.random().toString(36).slice(2,9); }
 
 function nowStr(){
@@ -11239,18 +11251,25 @@ function openCheckoutForm(it, mode){
 
 /* ============ CHECK IN/OUT LOGIC ============ */
 async function checkOutUnit(it, holder, purpose){
+  it = resolveLive(it);
+  if(!it){ toast('This item no longer exists — it may have been removed elsewhere.'); render(); return; }
   it.status = 'out'; it.holder = holder; it.purpose = purpose; it.since = nowStr();
   STATE.log.unshift({ts:Date.now(), tsStr:nowStr(), itemId:it.id, itemName:it.brand+' '+it.model, action:'check_out', qty:1, holder, purpose});
   await persist(); render();
   toast(`${it.id} checked out to ${holder}`);
 }
 async function checkInUnit(it){
+  it = resolveLive(it);
+  if(!it){ toast('This item no longer exists — it may have been removed elsewhere.'); render(); return; }
   STATE.log.unshift({ts:Date.now(), tsStr:nowStr(), itemId:it.id, itemName:it.brand+' '+it.model, action:'check_in', qty:1, holder:it.holder, purpose:it.purpose});
   it.status = 'in'; it.holder = null; it.purpose = null; it.since = null;
   await persist(); render();
   toast(`${it.id} checked in`);
 }
 async function checkOutStock(it, qty, holder, purpose){
+  it = resolveLive(it);
+  if(!it){ toast('This item no longer exists — it may have been removed elsewhere.'); render(); return; }
+  if(qty > it.available){ toast(`Only ${it.available} available right now — someone else may have just checked some out.`); render(); return; }
   it.available -= qty;
   it.checkouts = it.checkouts || [];
   it.checkouts.push({id:uid(), qty, holder, purpose, since:nowStr()});
@@ -11259,6 +11278,10 @@ async function checkOutStock(it, qty, holder, purpose){
   toast(`${qty} × ${it.id} checked out to ${holder}`);
 }
 async function checkOutStockMultiple(it, recipients){
+  it = resolveLive(it);
+  if(!it){ toast('This item no longer exists — it may have been removed elsewhere.'); render(); return; }
+  const total = recipients.reduce((a,r)=>a+(parseInt(r.qty,10)||0), 0);
+  if(total > it.available){ toast(`Only ${it.available} available right now — someone else may have just checked some out.`); render(); return; }
   it.checkouts = it.checkouts || [];
   recipients.forEach(r=>{
     const qty = parseInt(r.qty, 10) || 1;
@@ -11273,8 +11296,10 @@ async function checkOutStockMultiple(it, recipients){
   toast(`${it.id} checked out to ${names}`);
 }
 async function returnStock(it, checkoutId){
+  it = resolveLive(it);
+  if(!it){ toast('This item no longer exists — it may have been removed elsewhere.'); render(); return; }
   const idx = (it.checkouts||[]).findIndex(c=>c.id===checkoutId);
-  if(idx === -1) return;
+  if(idx === -1){ toast('That checkout record is no longer there — it may have already been returned elsewhere.'); render(); return; }
   const c = it.checkouts[idx];
   it.available += c.qty;
   it.checkouts.splice(idx,1);
