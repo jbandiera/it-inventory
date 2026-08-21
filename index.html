@@ -10394,9 +10394,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   }
   .single-print-label .label-text{min-width:0;}
   .single-print-label .tag-id{font-family:'IBM Plex Mono',monospace;font-weight:600;}
-  .single-print-label .tag-name{font-family:'Nunito',sans-serif;font-weight:800;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .single-print-label .tag-cat{color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .single-print-label .tag-name{font-family:'Nunito',sans-serif;font-weight:800;color:var(--ink);white-space:normal;word-break:break-word;line-height:1.15;}
+  .single-print-label .tag-cat{color:var(--ink-soft);white-space:normal;word-break:break-word;line-height:1.15;}
   .single-print-label.layout-stack .tag-id{font-size:10px;margin-top:0;line-height:1;}
+  .single-print-label.layout-stack .tag-name{font-size:8px;margin-top:2px;}
   .single-print-label.layout-row .tag-id{font-size:13px;}
   .single-print-label.layout-row .tag-name{font-size:13.5px;margin-top:2px;}
   .single-print-label.layout-row .tag-cat{font-size:11px;margin-top:1px;}
@@ -10928,7 +10929,7 @@ function renderQR(container, text, size){
 }
 
 const LABEL_SIZES = {
-  small:  {name:'Small',  hint:'USB drives, small parts', widthIn: 1,   heightIn: 1,   qrIn: 0.62, layout:'stack', showBrandModel: false, showCategory: false},
+  small:  {name:'Small',  hint:'USB drives, small parts', widthIn: 1,   heightIn: 1,   qrIn: 0.55, layout:'stack', showBrandModel: true, showCategory: false},
   medium: {name:'Medium', hint:'Hard drives, adapters',   widthIn: 2,   heightIn: 1,   qrIn: 0.82, layout:'row',   showBrandModel: true,  showCategory: false},
   large:  {name:'Large',  hint:'Laptops, larger gear',    widthIn: 3,   heightIn: 1.5, qrIn: 1.28, layout:'row',   showBrandModel: true,  showCategory: true}
 };
