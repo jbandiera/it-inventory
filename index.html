@@ -10417,6 +10417,45 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   .select-count{flex:1;text-align:center;font-family:'Nunito',sans-serif;font-weight:800;color:var(--purple);font-size:13px;}
   .item-checkbox{width:19px;height:19px;accent-color:var(--purple);flex-shrink:0;margin-right:2px;}
 
+  /* DESKTOPS */
+  select{font-family:'Nunito',sans-serif;font-size:15px;padding:11px 13px;border-radius:8px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);width:100%;}
+  .dt-chips{display:flex;gap:8px;overflow-x:auto;margin:12px 0 12px;padding-bottom:2px;}
+  .dt-chip{min-height:40px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-family:'Nunito',sans-serif;font-size:13.5px;font-weight:700;white-space:nowrap;cursor:pointer;}
+  .dt-chip.active{background:var(--purple);border-color:var(--purple);color:#fff;font-weight:800;}
+  .dt-card{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);cursor:pointer;}
+  .dt-card:active{background:var(--pink-bg);}
+  .dt-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .dt-name{font-size:17px;font-weight:800;}
+  .dt-sub{font-size:12.5px;font-weight:600;color:#66527F;margin-top:2px;}
+  .dt-specs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px;}
+  .dt-spec-label{font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#66527F;}
+  .dt-spec-val{font-size:13.5px;font-weight:700;margin-top:1px;word-break:break-word;}
+  .dt-spec-val.empty{color:#86570A;}
+  .dt-segs{display:flex;gap:4px;margin-top:14px;}
+  .dt-seg{flex:1;height:6px;border-radius:3px;background:var(--line);}
+  .dt-seg.on{background:var(--purple);}
+  .dt-count{font-size:11.5px;font-weight:700;color:#66527F;margin-top:6px;}
+  .dt-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+  .dt-tile{background:var(--pink-bg);border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;}
+  .dt-tile-val{font-size:14.5px;font-weight:800;margin-top:2px;word-break:break-word;}
+  .dt-parts{background:var(--card);border:1.5px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:14px;}
+  .dt-part-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-top:1px solid var(--line);}
+  .dt-part-row:first-child{border-top:none;}
+  .dt-part-main{flex:1;min-width:0;}
+  .dt-part-name{font-size:14.5px;font-weight:800;margin-top:1px;word-break:break-word;}
+  .dt-part-btns{display:flex;gap:6px;flex-shrink:0;}
+  .btn.small.ghost.dt-btn{min-height:40px;padding:0 14px;border-width:1.5px;font-size:12.5px;}
+  .btn.small.ghost.dt-danger{color:var(--rust);border-color:var(--rust);}
+  .dt-opt{display:flex;align-items:center;gap:12px;min-height:60px;box-sizing:border-box;padding:10px 14px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;cursor:pointer;}
+  .dt-opt.selected{background:var(--pink-bg);border:2px solid var(--purple);}
+  .dt-opt input{width:22px;height:22px;margin:0;accent-color:var(--purple);flex-shrink:0;}
+  .dt-opt-main{flex:1;min-width:0;}
+  .dt-opt-name{display:block;font-size:14.5px;font-weight:800;}
+  .dt-opt-sub{display:block;font-size:12px;font-weight:600;color:#66527F;margin-top:1px;}
+  .dt-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+  .dt-summary{background:var(--pink-bg);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;font-weight:600;line-height:1.45;}
+  .dt-hist{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;gap:10px;}
+
 
   /* LABEL SIZE PICKER */
   .size-options{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
@@ -10461,6 +10500,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     <button data-tab="inventory" class="active">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/></svg>
       <span>List</span><span class="dot"></span>
+    </button>
+    <button data-tab="desktops">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+      <span>Desktops</span><span class="dot"></span>
     </button>
     <button data-tab="scan">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8V5a1 1 0 0 1 1-1h3M20 8V5a1 1 0 0 0-1-1h-3M4 16v3a1 1 0 0 0 1 1h3M20 16v3a1 1 0 0 1-1 1h-3M4 12h16"/></svg>
@@ -10700,7 +10743,9 @@ function switchTab(tab){
   render();
   stopScan();
   if(tab === 'scan') startScanUI();
-  document.getElementById('addFab').classList.toggle('hidden', tab !== 'inventory');
+  const fab = document.getElementById('addFab');
+  fab.classList.toggle('hidden', tab !== 'inventory' && tab !== 'desktops');
+  fab.title = tab === 'desktops' ? 'Add desktop' : 'Add item';
 }
 
 document.querySelectorAll('nav.bottom button').forEach(b=>{
@@ -10712,6 +10757,7 @@ function render(){
   renderStats();
   const main = document.getElementById('main');
   if(currentTab === 'inventory') return renderInventory(main);
+  if(currentTab === 'desktops') return renderDesktops(main);
   if(currentTab === 'scan') return renderScan(main);
   if(currentTab === 'print') return renderPrint(main);
   if(currentTab === 'activity') return renderActivity(main);
@@ -10781,10 +10827,14 @@ function renderInventoryBody(){
     items.forEach(it=>{
       let badge = '';
       if(it.type==='unit'){
-        badge = it.status==='out' ? `<span class="badge out">Out</span>` : `<span class="badge in">In</span>`;
+        badge = it.desktopId ? `<span class="badge stock">In ${escapeHtml(it.desktopId)}</span>` : (it.status==='out' ? `<span class="badge out">Out</span>` : `<span class="badge in">In</span>`);
       } else {
         const low = it.available <= Math.ceil(it.qty*0.2) && it.available < it.qty;
         badge = `<span class="badge ${low?'low':'stock'}">${it.available}/${it.qty}</span>`;
+        const dts = Array.from(new Set((it.checkouts||[]).filter(c=>c.desktopId).map(c=>c.desktopId)));
+        if(dts.length){
+          badge = `<span style="display:flex;gap:6px;align-items:center;flex-shrink:0;"><span class="badge stock">${dts.length === 1 ? 'In ' + escapeHtml(dts[0]) : 'In ' + dts.length + ' desktops'}</span>${badge}</span>`;
+        }
       }
       resultsHtml += `<div class="item-row" data-id="${it.id}">
         ${selectMode ? `<input type="checkbox" class="item-checkbox" ${selectedIds.has(it.id)?'checked':''} tabindex="-1">` : ''}
@@ -10849,6 +10899,11 @@ function openDetail(id){
       statusBlock = `
         <div style="text-align:center;margin-bottom:14px;"><span class="stamp in">In Stock</span></div>
         <button class="btn green" id="doCheckout">Check Out</button>`;
+    } else if(it.desktopId){
+      statusBlock = `
+        <div style="text-align:center;margin-bottom:14px;"><span class="stamp" style="background:var(--purple);">Installed</span></div>
+        <div class="info-box" style="margin-bottom:16px;"><div class="lbl">Installed in</div><div class="val">${escapeHtml(it.desktopId)}</div></div>
+        <button class="btn" id="viewDesktopBtn" data-dt="${escapeHtml(it.desktopId)}">View ${escapeHtml(it.desktopId)}</button>`;
     } else {
       statusBlock = `
         <div style="text-align:center;margin-bottom:14px;"><span class="stamp out">Checked Out</span></div>
@@ -10866,7 +10921,7 @@ function openDetail(id){
           <div class="who">${escapeHtml(c.holder)} <span style="color:var(--ink-soft);font-weight:400;">× ${c.qty}</span></div>
           <div class="meta">${escapeHtml(c.purpose||'')} · ${escapeHtml(c.since)}</div>
         </div>
-        <button class="btn small rust" data-return="${c.id}">Return</button>
+        ${c.desktopId ? `<button class="btn small ghost" data-viewdt="${escapeHtml(c.desktopId)}">View</button>` : `<button class="btn small rust" data-return="${c.id}">Return</button>`}
       </div>`).join('');
     statusBlock = `
       <div class="info-grid">
@@ -10912,6 +10967,11 @@ function openDetail(id){
   if(ci) ci.addEventListener('click', async ()=>{ await checkInUnit(it); closeDetail(); });
   const so = document.getElementById('doStockOut');
   if(so) so.addEventListener('click', ()=>openCheckoutForm(it, 'stock'));
+  const vdt = document.getElementById('viewDesktopBtn');
+  if(vdt) vdt.addEventListener('click', ()=>openDesktopDetail(vdt.dataset.dt));
+  root.querySelectorAll('[data-viewdt]').forEach(btn=>{
+    btn.addEventListener('click', ()=>openDesktopDetail(btn.dataset.viewdt));
+  });
   root.querySelectorAll('[data-return]').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       await returnStock(it, btn.dataset.return);
@@ -11403,7 +11463,10 @@ function openAddItemForm(){
   });
 }
 
-document.getElementById('addFab').addEventListener('click', openAddItemForm);
+document.getElementById('addFab').addEventListener('click', ()=>{
+  if(currentTab === 'desktops') openDesktopForm(null);
+  else openAddItemForm();
+});
 
 /* ============ SCAN TAB ============ */
 function renderScan(main){
@@ -11428,7 +11491,8 @@ function renderScan(main){
     const val = document.getElementById('manualId').value.trim();
     if(!val) return;
     const it = findItem(val);
-    if(it){ openDetail(it.id); } else { toast('No item with ID '+val); }
+    const dtMatch = it ? null : findDesktop(val);
+    if(it){ openDetail(it.id); } else if(dtMatch){ openDesktopDetail(dtMatch.id); } else { toast('No item or desktop with ID '+val); }
   });
   document.getElementById('manualId').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter') document.getElementById('manualGo').click();
@@ -11481,9 +11545,13 @@ async function startScanUI(){
           }
           if(code && code.data && Date.now() - lastHit > 1500){
             const it = findItem(code.data);
+            const scannedDt = it ? null : findDesktop(code.data);
             if(it){
               lastHit = Date.now();
               openDetail(it.id);
+            } else if(scannedDt){
+              lastHit = Date.now();
+              openDesktopDetail(scannedDt.id);
             }
           }
         }
@@ -11544,6 +11612,11 @@ function renderActivity(main){
       let actionLabel, color;
       if(l.action === 'check_out'){ actionLabel = 'Checked Out'; color = 'var(--rust)'; }
       else if(l.action === 'removed'){ actionLabel = 'Removed'; color = 'var(--ink-soft)'; }
+      else if(l.action === 'install'){ actionLabel = 'Installed'; color = 'var(--purple)'; }
+      else if(l.action === 'uninstall'){ actionLabel = 'Uninstalled'; color = 'var(--green)'; }
+      else if(l.action === 'faulty'){ actionLabel = 'Marked faulty'; color = 'var(--rust)'; }
+      else if(l.action === 'desktop_added'){ actionLabel = 'Desktop added'; color = 'var(--purple)'; }
+      else if(l.action === 'desktop_retired'){ actionLabel = 'Desktop retired'; color = 'var(--ink-soft)'; }
       else { actionLabel = 'Checked In'; color = 'var(--green)'; }
       html += `<div class="log-row">
         <div class="log-left">
@@ -11562,6 +11635,11 @@ function renderActivity(main){
 
 /* ============ REMOVE ITEM ============ */
 function confirmRemoveItem(it){
+  const installedIn = (it.desktopId ? [it.desktopId] : []).concat((it.checkouts||[]).filter(c=>c.desktopId).map(c=>c.desktopId));
+  if(installedIn.length){
+    alert(`${it.id} is installed in ${Array.from(new Set(installedIn)).join(', ')}. Remove it from the desktop first, then you can delete it from inventory.`);
+    return;
+  }
   let warning = '';
   if(it.type === 'unit' && it.status === 'out'){
     warning = ` Note: this is currently checked out to ${it.holder || 'someone'} — removing it will drop that record.`;
@@ -11583,6 +11661,617 @@ async function removeItem(it){
   closeDetail();
   render();
   toast(`${it.id} removed from inventory`);
+}
+
+/* ============ DESKTOPS ============ */
+// A desktop's parts are real inventory items. Installing a part checks it out
+// of inventory to the desktop; swapping/removing returns it (or marks it faulty).
+const DT_SLOTS = [
+  {key:'cpu',         label:'CPU',          category:'CPU',          multi:false},
+  {key:'motherboard', label:'Motherboard',  category:'Motherboard',  multi:false},
+  {key:'gpu',         label:'GPU',          category:'GPU',          multi:true},
+  {key:'ram',         label:'RAM',          category:'Memory (RAM)', multi:true},
+  {key:'storage',     label:'Storage',      category:'Storage',      multi:true},
+  {key:'psu',         label:'Power supply', category:'Power - UPS',  multi:false, filter: it => !/UPS/i.test(it.model)},
+  {key:'cooler',      label:'Cooler',       category:'Cooling',      multi:false},
+  {key:'case',        label:'Case',         category:'Case',         multi:false}
+];
+const DT_STATUS = {
+  in_service: {label:'In service', cls:'in'},
+  building:   {label:'Building',   cls:'low'},
+  spare:      {label:'Spare',      cls:'stock'}
+};
+let dtFilter = 'all';
+let dtQuery = '';
+
+function getDesktops(){
+  if(!STATE.desktops) STATE.desktops = [];
+  return STATE.desktops;
+}
+function findDesktop(id){
+  const key = String(id).toLowerCase();
+  return getDesktops().find(d => d.id.toLowerCase() === key) || null;
+}
+function slotDef(key){ return DT_SLOTS.find(s => s.key === key); }
+function partsOf(d, key){ return (d.parts && d.parts[key]) ? d.parts[key] : []; }
+function newDesktopParts(){ const p = {}; DT_SLOTS.forEach(s => { p[s.key] = []; }); return p; }
+function itemLabel(it){ return it ? (it.brand + ' ' + it.model) : 'Unknown part'; }
+function filledCount(d){ return DT_SLOTS.filter(s => partsOf(d, s.key).length > 0).length; }
+function nextDesktopName(){
+  let max = 0;
+  getDesktops().forEach(d => { const m = /^(?:CF-)?DT-?(\d+)$/i.exec(d.id); if(m) max = Math.max(max, parseInt(m[1], 10)); });
+  return 'CF-DT' + String(max + 1).padStart(2, '0');
+}
+function desktopLabelItem(d){ return {id:d.id, brand:'Desktop', model:d.assignee || '', category:d.location || 'Desktop'}; }
+
+// A desktop part entry is either an inventory part {itemId, qty} or a custom
+// part that isn't tracked in inventory {itemId:null, name, qty, custom:true, eid}.
+function entryKey(e){ return e.itemId || e.eid; }
+function entryText(e){
+  if(e.itemId){ const it = findItem(e.itemId); return it ? it.model : e.itemId; }
+  return e.name || 'Custom part';
+}
+function entryFullName(e){
+  if(e.itemId){ const it = findItem(e.itemId); return it ? itemLabel(it) : e.itemId; }
+  return e.name || 'Custom part';
+}
+function findEntry(d, slotKey, key){ return partsOf(d, slotKey).find(e => entryKey(e) === key) || null; }
+
+// Short text shown for a slot on cards/tiles (null when the slot is empty)
+function specValue(d, key){
+  const entries = partsOf(d, key);
+  if(!entries.length) return null;
+  if(key === 'ram'){
+    let total = 0, ok = true;
+    entries.forEach(e => {
+      const m = /(\d+)\s*GB/i.exec(entryText(e));
+      if(m) total += parseInt(m[1], 10) * e.qty; else ok = false;
+    });
+    if(ok){
+      if(entries.length === 1 && entries[0].qty > 1){
+        const per = parseInt(/(\d+)\s*GB/i.exec(entryText(entries[0]))[1], 10);
+        return total + ' GB (' + entries[0].qty + ' \u00d7 ' + per + ' GB)';
+      }
+      return total + ' GB';
+    }
+  }
+  return entries.map(e => e.qty > 1 ? (e.qty + ' \u00d7 ' + entryText(e)) : entryText(e)).join(', ');
+}
+
+/* ---- Desktops tab ---- */
+function renderDesktops(main){
+  if(!document.getElementById('dtSearch')){
+    main.innerHTML = `<input type="text" id="dtSearch" placeholder="Search desktop, user, or part..." value="${escapeHtml(dtQuery)}">
+      <div class="dt-chips" id="dtChips"></div>
+      <div id="dtBody"></div>`;
+    document.getElementById('dtSearch').addEventListener('input', (e)=>{ dtQuery = e.target.value; renderDesktopsBody(); });
+  }
+  renderDesktopsBody();
+}
+
+function renderDesktopsBody(){
+  const chipsEl = document.getElementById('dtChips');
+  const body = document.getElementById('dtBody');
+  if(!chipsEl || !body) return;
+  const all = getDesktops();
+  const chips = [['all','All'], ['in_service','In service'], ['building','Building'], ['spare','Spare']];
+  chipsEl.innerHTML = chips.map(([k, l]) => `<button type="button" class="dt-chip ${dtFilter===k?'active':''}" data-f="${k}">${l}</button>`).join('');
+  chipsEl.querySelectorAll('.dt-chip').forEach(b => b.addEventListener('click', ()=>{ dtFilter = b.dataset.f; renderDesktopsBody(); }));
+
+  if(!all.length){
+    body.innerHTML = `<div class="empty-state"><div class="big">No desktops yet</div>Tap + to add your first desktop, then install parts from your inventory.</div>`;
+    return;
+  }
+  const q = dtQuery.trim().toLowerCase();
+  const list = all.filter(d => {
+    if(dtFilter !== 'all' && d.status !== dtFilter) return false;
+    if(!q) return true;
+    const partText = DT_SLOTS.map(s => partsOf(d, s.key).map(e => { if(!e.itemId) return e.name || ''; const it = findItem(e.itemId); return it ? (itemLabel(it) + ' ' + it.id) : e.itemId; }).join(' ')).join(' ');
+    return (d.id + ' ' + (d.assignee || '') + ' ' + (d.location || '') + ' ' + partText).toLowerCase().includes(q);
+  });
+  if(!list.length){
+    body.innerHTML = `<div class="empty-state"><div class="big">No matches</div>Try a different search or filter.</div>`;
+    return;
+  }
+  body.innerHTML = list.map(dtCardHtml).join('');
+  body.querySelectorAll('.dt-card').forEach(c => c.addEventListener('click', ()=>openDesktopDetail(c.dataset.id)));
+}
+
+function dtCardHtml(d){
+  const st = DT_STATUS[d.status] || DT_STATUS.in_service;
+  const cells = [['CPU','cpu'], ['GPU','gpu'], ['RAM','ram'], ['Storage','storage'], ['Motherboard','motherboard'], ['Power supply','psu']].map(([label, key]) => {
+    const v = specValue(d, key);
+    return `<div><div class="dt-spec-label">${label}</div><div class="dt-spec-val ${v ? '' : 'empty'}">${v ? escapeHtml(v) : 'Empty slot'}</div></div>`;
+  }).join('');
+  const segs = DT_SLOTS.map(s => `<div class="dt-seg ${partsOf(d, s.key).length ? 'on' : ''}"></div>`).join('');
+  const who = (d.assignee ? 'Assigned to ' + d.assignee : 'Unassigned') + (d.location ? ' \u00b7 ' + d.location : '');
+  return `<div class="dt-card" data-id="${escapeHtml(d.id)}">
+    <div class="dt-card-top">
+      <div><div class="dt-name">${escapeHtml(d.id)}</div><div class="dt-sub">${escapeHtml(who)}</div></div>
+      <span class="badge ${st.cls}">${st.label}</span>
+    </div>
+    <div class="dt-specs">${cells}</div>
+    <div class="dt-segs">${segs}</div>
+    <div class="dt-count">${filledCount(d)} of ${DT_SLOTS.length} parts recorded</div>
+  </div>`;
+}
+
+/* ---- Desktop detail ---- */
+function openDesktopDetail(id){
+  const d = findDesktop(id);
+  if(!d){ toast('Desktop not found: ' + id); return; }
+  const root = document.getElementById('overlayRoot');
+  const st = DT_STATUS[d.status] || DT_STATUS.in_service;
+  const tile = (label, key) => {
+    const v = specValue(d, key);
+    return `<div class="dt-tile"><div class="dt-spec-label">${label}</div><div class="dt-tile-val">${v ? escapeHtml(v) : '<span style="color:#86570A;">Empty slot</span>'}</div></div>`;
+  };
+  let rows = '';
+  DT_SLOTS.forEach(s => {
+    const entries = partsOf(d, s.key);
+    if(!entries.length){
+      rows += `<div class="dt-part-row"><div class="dt-part-main"><div class="dt-spec-label">${s.label}</div><div class="dt-part-name" style="color:#86570A;">Empty slot</div></div>
+        <div class="dt-part-btns"><button type="button" class="btn small ghost dt-btn" data-act="install" data-slot="${s.key}">Install</button></div></div>`;
+      return;
+    }
+    entries.forEach((e, i) => {
+      const key = entryKey(e);
+      rows += `<div class="dt-part-row"><div class="dt-part-main">
+          <div class="dt-spec-label">${i === 0 ? s.label : s.label + ' ' + (i + 1)}</div>
+          <div class="dt-part-name">${escapeHtml(entryFullName(e))}${e.qty > 1 ? ' \u00d7 ' + e.qty : ''}</div>
+          <div class="item-id">${e.itemId ? escapeHtml(e.itemId) : 'Not in inventory'}</div></div>
+        <div class="dt-part-btns">
+          <button type="button" class="btn small ghost dt-btn" data-act="swap" data-slot="${s.key}" data-item="${escapeHtml(key)}">Swap</button>
+          <button type="button" class="btn small ghost dt-btn dt-danger" data-act="remove" data-slot="${s.key}" data-item="${escapeHtml(key)}">Remove</button>
+        </div></div>`;
+    });
+    if(s.multi){
+      rows += `<div class="dt-part-row"><button type="button" class="btn small ghost dt-btn" data-act="install" data-slot="${s.key}">+ Add ${s.label}</button></div>`;
+    }
+  });
+
+  const histLabels = {install:'Installed', uninstall:'Uninstalled', faulty:'Marked faulty', desktop_added:'Created', desktop_retired:'Retired'};
+  const hist = STATE.log.filter(l => l.desktopId === d.id).slice(0, 6).map(l => {
+    const text = (l.action === 'desktop_added') ? 'Desktop added'
+      : (escapeHtml(l.purpose || '') + ': ' + escapeHtml(l.itemName || '') + (l.qty > 1 ? ' \u00d7 ' + l.qty : ''));
+    return `<div class="dt-hist"><div><div style="font-size:13.5px;font-weight:700;">${text}</div><div style="font-size:11.5px;font-weight:600;color:#66527F;margin-top:2px;">${escapeHtml(l.tsStr || '')}</div></div>
+      <span class="badge stock" style="align-self:flex-start;white-space:nowrap;">${histLabels[l.action] || ''}</span></div>`;
+  }).join('');
+
+  const who = (d.assignee ? 'Assigned to ' + d.assignee : 'Unassigned') + (d.location ? ' \u00b7 ' + d.location : '');
+  root.innerHTML = `
+    <div class="overlay" id="dtOverlay">
+      <div class="sheet" style="position:relative;">
+        <button class="sheet-close" id="dtClose">&times;</button>
+        <div class="sheet-handle"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;padding-right:30px;">
+          <div><div style="font-size:26px;font-weight:800;line-height:1.1;">${escapeHtml(d.id)}</div>
+            <div style="font-size:13px;font-weight:600;color:#66527F;margin-top:4px;">${escapeHtml(who)}</div></div>
+          <span class="badge ${st.cls}">${st.label}</span>
+        </div>
+        <div class="dt-tiles">
+          ${tile('CPU','cpu')}${tile('GPU','gpu')}${tile('RAM','ram')}
+          <div class="dt-tile"><div class="dt-spec-label">Parts recorded</div><div class="dt-tile-val">${filledCount(d)} of ${DT_SLOTS.length}</div></div>
+        </div>
+        <div class="section-title" style="margin:2px 4px 8px;">Installed parts</div>
+        <div class="dt-parts">${rows}</div>
+        <button type="button" class="btn ghost no-print" id="dtPrint" style="margin-bottom:14px;">Print desktop label</button>
+        <div class="section-title" style="margin:2px 4px 8px;">Change history</div>
+        ${hist || '<div style="font-size:12.5px;color:#66527F;font-weight:600;margin:0 4px 8px;">No changes yet.</div>'}
+        <div style="margin-top:14px;border-top:1px dashed var(--line);padding-top:14px;display:flex;flex-direction:column;gap:12px;">
+          <a class="reset-link" id="dtEdit">Edit details</a>
+          <a class="reset-link" id="dtRetire" style="color:var(--rust);">Retire this desktop and return its parts to inventory</a>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('dtOverlay').addEventListener('click', (e)=>{ if(e.target.id === 'dtOverlay') closeDetail(); });
+  document.getElementById('dtClose').addEventListener('click', closeDetail);
+  document.getElementById('dtPrint').addEventListener('click', ()=>openPrintPrompt(desktopLabelItem(d)));
+  document.getElementById('dtEdit').addEventListener('click', ()=>openDesktopForm(d));
+  document.getElementById('dtRetire').addEventListener('click', ()=>confirmRetireDesktop(d.id));
+  root.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', ()=>{
+    const act = b.dataset.act, slot = b.dataset.slot, item = b.dataset.item || null;
+    if(act === 'install') openPartSheet(d.id, slot, null, 'install');
+    else if(act === 'swap') openPartSheet(d.id, slot, item, 'swap');
+    else if(act === 'remove') openPartSheet(d.id, slot, item, 'remove');
+  }));
+}
+
+/* ---- Add / edit desktop ---- */
+function openDesktopForm(d){
+  const editing = !!d;
+  const root = document.getElementById('overlayRoot');
+  const opts = Object.keys(DT_STATUS).map(k => `<option value="${k}" ${(editing ? d.status : 'building') === k ? 'selected' : ''}>${DT_STATUS[k].label}</option>`).join('');
+  root.innerHTML = `
+    <div class="overlay" id="dfOverlay">
+      <div class="sheet" style="position:relative;">
+        <button class="sheet-close" id="dfClose">&times;</button>
+        <div class="sheet-handle"></div>
+        <div class="section-title" style="margin-top:0;">${editing ? 'Edit Desktop' : 'Add Desktop'}</div>
+        <div class="field"><label>Name / hostname</label>
+          <input type="text" id="dfName" value="${escapeHtml(editing ? d.id : nextDesktopName())}" ${editing ? 'disabled' : ''} placeholder="e.g. CF-DT04"></div>
+        <div class="field"><label>Assigned to</label>
+          <input type="text" id="dfAssignee" value="${escapeHtml(editing ? (d.assignee || '') : '')}" placeholder="Name (optional)"></div>
+        <div class="field"><label>Location</label>
+          <input type="text" id="dfLocation" value="${escapeHtml(editing ? (d.location || '') : '')}" placeholder="e.g. Render room (optional)"></div>
+        <div class="field"><label>Status</label><select id="dfStatus">${opts}</select></div>
+        <button class="btn green" id="dfSave">${editing ? 'Save Changes' : 'Add Desktop'}</button>
+      </div>
+    </div>`;
+  document.getElementById('dfOverlay').addEventListener('click', (e)=>{ if(e.target.id === 'dfOverlay') closeDetail(); });
+  document.getElementById('dfClose').addEventListener('click', ()=>{ if(editing) openDesktopDetail(d.id); else closeDetail(); });
+  document.getElementById('dfSave').addEventListener('click', async ()=>{
+    const name = document.getElementById('dfName').value.trim();
+    const assignee = document.getElementById('dfAssignee').value.trim();
+    const location = document.getElementById('dfLocation').value.trim();
+    const status = document.getElementById('dfStatus').value;
+    if(editing){
+      const live = findDesktop(d.id);
+      if(!live){ toast('That desktop no longer exists.'); closeDetail(); render(); return; }
+      live.assignee = assignee; live.location = location; live.status = status;
+      await persist(); render();
+      toast('Saved');
+      openDesktopDetail(live.id);
+      return;
+    }
+    if(!name){ toast('Enter a name for the desktop'); return; }
+    if(findDesktop(name)){ toast(name + ' already exists'); return; }
+    if(findItem(name)){ toast(name + ' is already an inventory ID \u2014 pick another name'); return; }
+    getDesktops().push({id:name, assignee, location, status, parts:newDesktopParts(), createdAt:nowStr()});
+    STATE.log.unshift({ts:Date.now(), tsStr:nowStr(), itemId:'Desktop', itemName:name, action:'desktop_added', qty:1, holder:assignee, purpose:'', desktopId:name});
+    await persist(); render();
+    toast('Added ' + name);
+    openDesktopDetail(name);
+  });
+}
+
+/* ---- Install / swap / remove a part ---- */
+// A part can come from inventory (checked out of stock) or be entered by name
+// ("Not in inventory") for machines that already have parts that were never logged.
+function openPartSheet(desktopId, slotKey, oldKey, mode){
+  const d = findDesktop(desktopId), slot = slotDef(slotKey);
+  if(!d || !slot){ toast('Desktop not found.'); return; }
+  const oldEntry = oldKey ? findEntry(d, slotKey, oldKey) : null;
+  if(mode !== 'install' && !oldEntry){ toast('That part is no longer in this desktop.'); openDesktopDetail(d.id); return; }
+  const oldIsInv = !!(oldEntry && oldEntry.itemId);
+  const verb = {install:'Install', swap:'Swap', remove:'Remove'}[mode];
+  const prep = {install:'in', swap:'on', remove:'from'}[mode];
+
+  let candidates = [];
+  if(mode !== 'remove'){
+    candidates = STATE.items.filter(it =>
+      it.category === slot.category && (!slot.filter || slot.filter(it)) && !(oldIsInv && it.id === oldEntry.itemId) &&
+      ((it.type === 'unit' && it.status === 'in') || (it.type === 'stock' && it.available > 0)));
+  }
+
+  const currentCard = oldEntry ? `
+    <div class="dt-parts" style="padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
+      <div><div class="dt-spec-label">Currently installed</div>
+        <div class="dt-part-name">${escapeHtml(entryFullName(oldEntry))}${oldEntry.qty > 1 ? ' \u00d7 ' + oldEntry.qty : ''}</div>
+        <div class="item-id">${oldIsInv ? escapeHtml(oldEntry.itemId) : 'Not in inventory'}</div></div>
+      <span class="badge stock">In ${escapeHtml(d.id)}</span>
+    </div>` : '';
+
+  const pickHtml = mode === 'remove' ? '' : `
+    <div class="section-title" style="margin:2px 4px 8px;">${mode === 'swap' ? 'Choose a replacement' : 'Choose a part'}</div>
+    <div class="dt-chips" style="margin:0 0 12px;">
+      <button type="button" class="dt-chip" id="ptSrcInv">From inventory</button>
+      <button type="button" class="dt-chip" id="ptSrcCustom">New part</button>
+    </div>
+    <div id="ptInvBlock">
+      ${candidates.length ? `<div class="dt-opts">${candidates.map(it => `
+        <label class="dt-opt" data-id="${escapeHtml(it.id)}">
+          <input type="radio" name="dtPick" value="${escapeHtml(it.id)}">
+          <span class="dt-opt-main"><span class="dt-opt-name">${escapeHtml(itemLabel(it))}</span><span class="dt-opt-sub item-id">${escapeHtml(it.id)}</span></span>
+          <span class="badge in">${it.type === 'stock' ? it.available + ' of ' + it.qty + ' available' : 'In stock'}</span>
+        </label>`).join('')}</div>`
+        : `<div class="dt-summary">No available ${escapeHtml(slot.category)} items in inventory right now. Use "New part" to add one.</div>`}
+      <div class="field" id="ptQtyWrap" style="display:none;"><label id="ptQtyLabel">Quantity</label><input type="number" id="ptQty" min="1" value="1"></div>
+    </div>
+    <div id="ptCustomBlock" style="display:none;">
+      <div class="field"><label>Brand</label><input type="text" id="ptCustomBrand" placeholder="e.g. Intel"></div>
+      <div class="field"><label>Model / description</label><input type="text" id="ptCustomModel" placeholder="e.g. Core i7-9700K"></div>
+      ${slot.multi ? `<div class="field"><label>Quantity</label><input type="number" id="ptCustomQty" min="1" value="1"></div>` : ''}
+      <div class="dt-summary">This adds the part to your inventory under ${escapeHtml(slot.category)} and installs it in ${escapeHtml(d.id)}.</div>
+    </div>`;
+
+  const oldHtml = (oldIsInv && mode !== 'install') ? `
+    <div class="section-title" style="margin:2px 4px 8px;">What happens to the old part?</div>
+    <div class="dt-opts">
+      <label class="dt-opt selected" data-old="return"><input type="radio" name="dtOld" value="return" checked>
+        <span class="dt-opt-main"><span class="dt-opt-name">Return it to inventory</span><span class="dt-opt-sub">Goes back into stock as available</span></span></label>
+      <label class="dt-opt" data-old="faulty"><input type="radio" name="dtOld" value="faulty">
+        <span class="dt-opt-main"><span class="dt-opt-name">Mark as faulty</span><span class="dt-opt-sub">Taken out of available stock</span></span></label>
+    </div>` : '';
+
+  const root = document.getElementById('overlayRoot');
+  root.innerHTML = `
+    <div class="overlay" id="ptOverlay">
+      <div class="sheet" style="position:relative;">
+        <button class="sheet-close" id="ptClose">&times;</button>
+        <div class="sheet-handle"></div>
+        <div class="section-title" style="margin-top:0;">${verb} ${escapeHtml(slot.label)} ${prep} ${escapeHtml(d.id)}</div>
+        ${currentCard}${pickHtml}${oldHtml}
+        <div class="dt-summary" id="ptSummary" style="display:none;"></div>
+        <button class="btn green" id="ptConfirm">${verb} ${escapeHtml(slot.label)}</button>
+        <button class="btn ghost" id="ptCancel" style="margin-top:10px;">Cancel</button>
+      </div>
+    </div>`;
+
+  let src = (mode !== 'remove' && candidates.length === 0) ? 'custom' : 'inv';
+  let selId = null, disp = 'return';
+  const qtyWrap = document.getElementById('ptQtyWrap');
+  const qtyInput = document.getElementById('ptQty');
+  const customBrand = document.getElementById('ptCustomBrand');
+  const customModel = document.getElementById('ptCustomModel');
+  const customQty = document.getElementById('ptCustomQty');
+  const summaryEl = document.getElementById('ptSummary');
+
+  function refresh(){
+    if(mode !== 'remove'){
+      document.getElementById('ptSrcInv').classList.toggle('active', src === 'inv');
+      document.getElementById('ptSrcCustom').classList.toggle('active', src === 'custom');
+      document.getElementById('ptInvBlock').style.display = src === 'inv' ? 'block' : 'none';
+      document.getElementById('ptCustomBlock').style.display = src === 'custom' ? 'block' : 'none';
+    }
+    const it = (src === 'inv' && selId) ? findItem(selId) : null;
+    if(qtyWrap){
+      const showQty = !!(it && it.type === 'stock');
+      qtyWrap.style.display = showQty ? 'block' : 'none';
+      if(showQty){
+        document.getElementById('ptQtyLabel').textContent = 'Quantity (max ' + it.available + ')';
+        qtyInput.max = it.available;
+        if(parseInt(qtyInput.value, 10) > it.available) qtyInput.value = it.available;
+      }
+    }
+    const typed = customModel ? ((customBrand.value.trim() + ' ' + customModel.value.trim()).trim()) : '';
+    const lines = [];
+    if(it) lines.push(it.id + ' checks out of stock into ' + d.id + '.');
+    if(src === 'custom' && typed) lines.push('"' + typed + '" is added to inventory and installed in ' + d.id + '.');
+    if(oldEntry && mode !== 'install'){
+      if(oldIsInv) lines.push(disp === 'faulty' ? (oldEntry.itemId + ' is marked faulty and stays out of available stock.') : (oldEntry.itemId + ' returns to stock.'));
+      else lines.push('"' + entryFullName(oldEntry) + '" is removed from this desktop.');
+    }
+    lines.push('Changes are logged in Activity.');
+    summaryEl.textContent = lines.join(' ');
+    summaryEl.style.display = (it || (src === 'custom' && typed) || mode === 'remove') ? 'block' : 'none';
+  }
+
+  if(mode !== 'remove'){
+    document.getElementById('ptSrcInv').addEventListener('click', ()=>{ src = 'inv'; refresh(); });
+    document.getElementById('ptSrcCustom').addEventListener('click', ()=>{ src = 'custom'; refresh(); if(customBrand) customBrand.focus(); });
+    if(customBrand) customBrand.addEventListener('input', refresh);
+    if(customModel) customModel.addEventListener('input', refresh);
+  }
+  root.querySelectorAll('input[name="dtPick"]').forEach(r => r.addEventListener('change', ()=>{
+    selId = r.value;
+    root.querySelectorAll('.dt-opt[data-id]').forEach(l => l.classList.toggle('selected', l.dataset.id === selId));
+    const it = findItem(selId);
+    if(it && it.type === 'stock' && qtyInput){
+      qtyInput.value = Math.max(1, Math.min(oldEntry ? oldEntry.qty : 1, it.available));
+    }
+    refresh();
+  }));
+  root.querySelectorAll('input[name="dtOld"]').forEach(r => r.addEventListener('change', ()=>{
+    disp = r.value;
+    root.querySelectorAll('.dt-opt[data-old]').forEach(l => l.classList.toggle('selected', l.dataset.old === disp));
+    refresh();
+  }));
+  refresh();
+
+  document.getElementById('ptOverlay').addEventListener('click', (e)=>{ if(e.target.id === 'ptOverlay') openDesktopDetail(d.id); });
+  document.getElementById('ptClose').addEventListener('click', ()=>openDesktopDetail(d.id));
+  document.getElementById('ptCancel').addEventListener('click', ()=>openDesktopDetail(d.id));
+  document.getElementById('ptConfirm').addEventListener('click', async ()=>{
+    let source = null;
+    if(mode !== 'remove'){
+      if(src === 'inv'){
+        const it = selId ? findItem(selId) : null;
+        if(!it){ toast('Choose a part first'); return; }
+        const qty = it.type === 'stock' ? parseInt(qtyInput.value, 10) : 1;
+        if(it.type === 'stock' && (!qty || qty < 1)){ toast('Enter a quantity'); return; }
+        source = {itemId: it.id, qty};
+      } else {
+        const brand = customBrand.value.trim(), model = customModel.value.trim();
+        if(!brand || !model){ toast('Enter both a brand and a model'); return; }
+        const qty = slot.multi ? parseInt(customQty.value, 10) : 1;
+        if(!qty || qty < 1){ toast('Enter a quantity'); return; }
+        source = {newPart: {brand, model}, qty};
+      }
+    }
+    document.getElementById('ptConfirm').disabled = true;
+    if(mode === 'install') await installPartAction(d.id, slotKey, source);
+    else if(mode === 'swap') await swapPartAction(d.id, slotKey, oldKey, source, disp);
+    else await removePartAction(d.id, slotKey, oldKey, disp);
+    openDesktopDetail(d.id);
+  });
+}
+
+/* ---- Inventory-linked mutations ----
+   Everything re-resolves the desktop and items from the live STATE right before
+   changing them (sync updates can replace STATE at any moment), validates first,
+   and then saves once. */
+function _installSync(d, slot, it, qty){
+  qty = parseInt(qty, 10) || 1;
+  if(it.type === 'unit'){
+    if(it.status !== 'in') return it.id + " isn't available right now.";
+    qty = 1;
+    it.status = 'out'; it.holder = d.id; it.purpose = 'Installed in ' + d.id + ' (' + slot.label + ')';
+    it.since = nowStr(); it.desktopId = d.id;
+  } else {
+    if(qty < 1) return 'Enter a quantity.';
+    if(qty > it.available) return 'Only ' + it.available + ' of ' + it.id + ' available right now.';
+    it.available -= qty;
+    it.checkouts = it.checkouts || [];
+    it.checkouts.push({id:uid(), qty, holder:d.id, purpose:'Installed in ' + d.id + ' (' + slot.label + ')', since:nowStr(), desktopId:d.id});
+  }
+  if(!d.parts) d.parts = newDesktopParts();
+  if(!d.parts[slot.key]) d.parts[slot.key] = [];
+  const existing = d.parts[slot.key].find(e => e.itemId === it.id);
+  if(existing) existing.qty += qty; else d.parts[slot.key].push({itemId:it.id, qty});
+  STATE.log.unshift({ts:Date.now(), tsStr:nowStr(), itemId:it.id, itemName:itemLabel(it), action:'install', qty, holder:d.id, purpose:slot.label, desktopId:d.id});
+  return null;
+}
+
+function _releaseFromInventory(it, d, qty, disp){
+  const faultyNote = 'Marked faulty (from ' + d.id + ')';
+  if(it.type === 'unit'){
+    if(disp === 'faulty'){ it.status = 'out'; it.holder = 'Faulty'; it.purpose = faultyNote; it.since = nowStr(); }
+    else { it.status = 'in'; it.holder = null; it.purpose = null; it.since = null; }
+    it.desktopId = null;
+    return;
+  }
+  let remaining = qty;
+  const mine = (it.checkouts || []).filter(c => c.desktopId === d.id);
+  mine.forEach(c => {
+    if(remaining <= 0) return;
+    const take = Math.min(c.qty, remaining);
+    if(disp === 'faulty'){
+      if(take < c.qty){
+        c.qty -= take;
+        it.checkouts.push({id:uid(), qty:take, holder:'Faulty', purpose:faultyNote, since:nowStr(), desktopId:null});
+      } else {
+        c.holder = 'Faulty'; c.purpose = faultyNote; c.since = nowStr(); c.desktopId = null;
+      }
+    } else {
+      it.available += take;
+      c.qty -= take;
+    }
+    remaining -= take;
+  });
+  it.checkouts = (it.checkouts || []).filter(c => c.qty > 0);
+}
+
+// Creates a new inventory item for a part that wasn't in inventory yet (or adds to an
+// existing stock item with the same brand/model), then installs it in the desktop so it
+// shows as "In <desktop>" in the inventory.
+function _installNewPartSync(d, slot, brand, model, qty){
+  brand = String(brand || '').trim(); model = String(model || '').trim();
+  qty = parseInt(qty, 10) || 1;
+  if(!brand || !model) return {err:'Enter both a brand and a model.'};
+  if(qty < 1) return {err:'Enter a quantity.'};
+  const category = slot.category;
+  let it = STATE.items.find(i => i.category === category && i.type === 'stock' &&
+    i.brand.toLowerCase() === brand.toLowerCase() && i.model.toLowerCase() === model.toLowerCase());
+  let created = false;
+  if(it){
+    it.qty += qty; it.available += qty;
+  } else {
+    const type = qty === 1 ? 'unit' : 'stock';
+    it = Object.assign({id: nextIdForCategory(category), category, brand, model, qty, type}, defaultRuntime({type, qty}));
+    STATE.items.push(it);
+    created = true;
+  }
+  const err = _installSync(d, slot, it, qty);
+  if(err){
+    if(created) STATE.items.splice(STATE.items.indexOf(it), 1); else { it.qty -= qty; it.available -= qty; }
+    return {err};
+  }
+  return {item: it, created};
+}
+
+function _releaseEntry(d, slot, entry, disp){
+  const isCustom = !entry.itemId;
+  const it = isCustom ? null : findItem(entry.itemId);
+  if(it) _releaseFromInventory(it, d, entry.qty, disp);
+  const arr = d.parts[slot.key];
+  const idx = arr.indexOf(entry);
+  if(idx > -1) arr.splice(idx, 1);
+  STATE.log.unshift({ts:Date.now(), tsStr:nowStr(),
+    itemId: isCustom ? 'Custom part' : entry.itemId,
+    itemName: isCustom ? (entry.name || 'Custom part') : (it ? itemLabel(it) : entry.itemId),
+    action: (disp === 'faulty' && !isCustom) ? 'faulty' : 'uninstall',
+    qty:entry.qty, holder:d.id, purpose:slot.label, desktopId:d.id});
+}
+
+// source is {itemId, qty} for an existing inventory part, or {newPart:{brand, model}, qty}
+// for a part that isn't in inventory yet (it gets added to inventory and installed).
+async function installPartAction(desktopId, slotKey, source){
+  const d = findDesktop(desktopId), slot = slotDef(slotKey);
+  if(!d || !slot || !source){ toast('That desktop no longer exists.'); render(); return false; }
+  if(!slot.multi && partsOf(d, slotKey).length){ toast('That slot is already filled \u2014 use Swap instead.'); return false; }
+  let err, label, added = false;
+  if(source.newPart){
+    const r = _installNewPartSync(d, slot, source.newPart.brand, source.newPart.model, source.qty);
+    err = r.err; label = r.item ? r.item.id : ''; added = true;
+  } else {
+    const it = findItem(source.itemId);
+    if(!it){ toast('That part no longer exists.'); render(); return false; }
+    err = _installSync(d, slot, it, source.qty);
+    label = it.id;
+  }
+  if(err){ toast(err); render(); return false; }
+  await persist(); render();
+  toast(added ? (label + ' added to inventory and installed in ' + d.id) : (label + ' installed in ' + d.id));
+  return true;
+}
+
+async function swapPartAction(desktopId, slotKey, oldKey, source, disp){
+  const d = findDesktop(desktopId), slot = slotDef(slotKey);
+  if(!d || !slot || !source){ toast('That desktop no longer exists.'); render(); return false; }
+  const oldEntry = findEntry(d, slotKey, oldKey);
+  if(!oldEntry){ toast('The old part is no longer in this desktop.'); render(); return false; }
+  // validate the replacement BEFORE touching anything
+  let nu = null;
+  if(source.newPart){
+    if(!String(source.newPart.brand || '').trim() || !String(source.newPart.model || '').trim()){ toast('Enter both a brand and a model.'); return false; }
+    if(!(parseInt(source.qty, 10) >= 1)){ toast('Enter a quantity.'); return false; }
+  } else {
+    nu = findItem(source.itemId);
+    if(!nu){ toast('That part no longer exists.'); render(); return false; }
+    if(oldEntry.itemId === nu.id){ toast('Pick a different part to swap in.'); return false; }
+    if(nu.type === 'unit' && nu.status !== 'in'){ toast(nu.id + " isn't available right now."); render(); return false; }
+    if(nu.type === 'stock' && (source.qty < 1 || source.qty > nu.available)){ toast('Only ' + nu.available + ' of ' + nu.id + ' available right now.'); render(); return false; }
+  }
+  const oldName = entryFullName(oldEntry);
+  _releaseEntry(d, slot, oldEntry, disp);
+  let err, newId;
+  if(source.newPart){
+    const r = _installNewPartSync(d, slot, source.newPart.brand, source.newPart.model, source.qty);
+    err = r.err; newId = r.item ? r.item.id : '';
+  } else {
+    err = _installSync(d, slot, nu, source.qty); newId = nu.id;
+  }
+  if(err){ toast(err); render(); return false; }
+  await persist(); render();
+  toast('Swapped ' + oldName + ' for ' + newId);
+  return true;
+}
+
+async function removePartAction(desktopId, slotKey, oldKey, disp){
+  const d = findDesktop(desktopId), slot = slotDef(slotKey);
+  if(!d || !slot){ toast('Desktop not found.'); render(); return false; }
+  const oldEntry = findEntry(d, slotKey, oldKey);
+  if(!oldEntry){ toast('That part is no longer in this desktop.'); render(); return false; }
+  const name = entryFullName(oldEntry), wasInv = !!oldEntry.itemId;
+  _releaseEntry(d, slot, oldEntry, disp);
+  await persist(); render();
+  toast(wasInv ? (name + (disp === 'faulty' ? ' marked faulty' : ' returned to inventory')) : (name + ' removed'));
+  return true;
+}
+
+function confirmRetireDesktop(id){
+  const d = findDesktop(id);
+  if(!d) return;
+  let inv = 0, custom = 0;
+  DT_SLOTS.forEach(s => partsOf(d, s.key).forEach(e => { if(e.itemId) inv++; else custom++; }));
+  const msg = 'Retire ' + d.id + '? ' + inv + ' inventory part' + (inv === 1 ? '' : 's') + ' will be returned to stock' +
+    (custom ? ', and ' + custom + ' part' + (custom === 1 ? '' : 's') + ' not in inventory will just be removed from the record.' : '.');
+  if(!confirm(msg)) return;
+  retireDesktop(d.id);
+}
+
+async function retireDesktop(id){
+  const d = findDesktop(id);
+  if(!d) return;
+  DT_SLOTS.forEach(slot => { partsOf(d, slot.key).slice().forEach(entry => _releaseEntry(d, slot, entry, 'return')); });
+  const idx = getDesktops().findIndex(x => x.id === d.id);
+  if(idx > -1) getDesktops().splice(idx, 1);
+  STATE.log.unshift({ts:Date.now(), tsStr:nowStr(), itemId:'Desktop', itemName:d.id, action:'desktop_retired', qty:1, holder:d.assignee || '', purpose:'', desktopId:d.id});
+  await persist();
+  closeDetail();
+  render();
+  toast(d.id + ' retired');
 }
 
 /* ============ INIT ============ */
