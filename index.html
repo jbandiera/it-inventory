@@ -10171,7 +10171,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     position:sticky;top:0;z-index:20;
     box-shadow:0 2px 14px rgba(107,62,189,0.22);
   }
-  .brand-row{display:flex;align-items:baseline;justify-content:space-between;}
+  .brand-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .brand-lockup{display:flex;align-items:center;gap:12px;min-width:0;}
+  .brand-logo{width:46px;height:46px;border-radius:12px;display:block;flex-shrink:0;box-shadow:0 2px 8px rgba(35,15,70,0.28);}
   .brand{
     font-family:'Nunito',sans-serif;
     font-weight:800;
@@ -10440,7 +10442,10 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 
   <header class="top">
     <div class="brand-row">
-      <div class="brand">Inventory<small>Your gear, all in one place</small></div>
+      <div class="brand-lockup">
+        <img class="brand-logo" src="icon-192.png" alt="CatFace" width="46" height="46">
+        <div class="brand">Inventory<small>Your gear, all in one place</small></div>
+      </div>
       <span id="syncBadge" style="display:none;background:rgba(255,255,255,0.22);color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:10.5px;padding:4px 10px;border-radius:999px;white-space:nowrap;">&#9679; Synced</span>
     </div>
     <div class="stat-strip">
